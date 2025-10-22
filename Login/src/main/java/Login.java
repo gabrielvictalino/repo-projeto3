@@ -48,7 +48,6 @@ class AuthService {
     }
 }
 
-/* =================== UI helpers (mesmos do login e cadastro) =================== */
 class GradientHeader extends JPanel {
     private final Color navy = new Color(22, 46, 80);
     private final Color tiffany = new Color(95, 206, 211);
