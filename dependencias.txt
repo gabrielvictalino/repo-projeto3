@@ -1,0 +1,14 @@
+lombok
+
+spring web
+
+spring security
+
+spring data jpa
+
+h2 database
+
+mysql driver
+
+
+
