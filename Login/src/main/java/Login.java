@@ -218,8 +218,15 @@ class TelaLogin extends JFrame {
         char[] pass = txtPass.getPassword();
         Role role = (Role) cbRole.getSelectedItem();
         User u = authService.authenticate(user, pass, role);
-        if(u!=null){
-            JOptionPane.showMessageDialog(this,"Bem-vindo(a), "+u.getUsername()+" • "+u.getRole());
+
+        if(u != null){
+            this.dispose();
+
+            if (u.getRole() == Role.ADMIN) {
+                new TelaAdmin(u).setVisible(true);
+            } else if (u.getRole() == Role.USUARIO) {
+                new TelaUsuario(u).setVisible(true);
+            }
 
         } else {
             JOptionPane.showMessageDialog(this,"Credenciais/Perfil inválidos.","Erro",JOptionPane.ERROR_MESSAGE);
@@ -359,4 +366,81 @@ class DialogCadastro extends JDialog {
     }
 
     public String getUltimoUsuarioCriado(){ return ultimoUsuarioCriado; }
+}
+
+class TelaAdmin extends JFrame {
+    public TelaAdmin(User user) {
+        super("Painel do Administrador");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setSize(600, 400);
+        setLocationRelativeTo(null);
+
+        JLabel welcomeLabel = new JLabel("Bem-vindo, Administrador " + user.getUsername() + "!", SwingConstants.CENTER);
+        welcomeLabel.setFont(new Font("SansSerif", Font.BOLD, 24));
+
+        JButton btnSair = new JButton("Sair");
+        btnSair.addActionListener(e -> {
+            this.dispose();
+        });
+
+        JPanel panel = new JPanel(new BorderLayout(10, 10));
+        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        panel.add(welcomeLabel, BorderLayout.CENTER);
+        panel.add(btnSair, BorderLayout.SOUTH);
+
+        setContentPane(panel);
+    }
+}
+
+class TelaUsuario extends JFrame {
+    public TelaUsuario(User user) {
+        super("Painel do Usuário Comum - " + user.getUsername());
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setSize(550, 350);
+        setLocationRelativeTo(null);
+
+        JMenuBar menuBar = new JMenuBar();
+
+        JMenu menuPrincipal = new JMenu("Menu");
+        JMenu menuSair = new JMenu("Sair"); // Adicionando "Sair" como aba principal por simplicidade
+
+        JMenuItem itemFeedback = new JMenuItem("Feedback");
+        JMenuItem itemQuestionarios = new JMenuItem("Questionários");
+        JMenuItem itemLogout = new JMenuItem("Sair do Sistema");
+
+        itemFeedback.addActionListener(e -> JOptionPane.showMessageDialog(this, "A funcionalidade de Feedback está em desenvolvimento.", "Informação", JOptionPane.INFORMATION_MESSAGE));
+        itemQuestionarios.addActionListener(e -> JOptionPane.showMessageDialog(this, "A funcionalidade de Questionários está em desenvolvimento.", "Informação", JOptionPane.INFORMATION_MESSAGE));
+
+        itemLogout.addActionListener(e -> this.dispose());
+        menuSair.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getButton() == MouseEvent.BUTTON1) {
+                    dispose();
+                }
+            }
+        });
+
+        menuPrincipal.add(itemFeedback);
+        menuPrincipal.add(itemQuestionarios);
+
+        menuBar.add(menuPrincipal);
+        menuBar.add(Box.createHorizontalGlue()); // Empurra o menu 'Sair' para a direita (opcional)
+        menuBar.add(menuSair);
+
+        setJMenuBar(menuBar);
+
+        JLabel welcomeLabel = new JLabel("Bem-vindo(a), Usuário(a) " + user.getUsername() + "!", SwingConstants.CENTER);
+        welcomeLabel.setFont(new Font("SansSerif", Font.PLAIN, 18));
+
+        JButton btnSair = new JButton("Sair");
+        btnSair.addActionListener(e -> this.dispose());
+
+        JPanel panel = new JPanel(new BorderLayout(10, 10));
+        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        panel.add(welcomeLabel, BorderLayout.CENTER);
+        panel.add(btnSair, BorderLayout.SOUTH);
+
+        setContentPane(panel);
+    }
 }
