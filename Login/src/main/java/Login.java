@@ -367,30 +367,44 @@ class DialogCadastro extends JDialog {
 
     public String getUltimoUsuarioCriado(){ return ultimoUsuarioCriado; }
 }
-
 class TelaAdmin extends JFrame {
     public TelaAdmin(User user) {
-        super("Painel do Administrador");
+        super("Admin - " + user.getUsername());
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(600, 400);
+        setSize(600, 380);
         setLocationRelativeTo(null);
 
-        JLabel welcomeLabel = new JLabel("Bem-vindo, Administrador " + user.getUsername() + "!", SwingConstants.CENTER);
-        welcomeLabel.setFont(new Font("SansSerif", Font.BOLD, 24));
+        JMenuBar menuBar = new JMenuBar();
 
-        JButton btnSair = new JButton("Sair");
-        btnSair.addActionListener(e -> {
-            this.dispose();
-        });
+        JMenu menuUsuarios = new JMenu("Usuários");
+        JMenuItem miListar = new JMenuItem("Listar");
+        JMenuItem miRemover = new JMenuItem("Remover");
+        menuUsuarios.add(miListar);
+        menuUsuarios.add(miRemover);
 
-        JPanel panel = new JPanel(new BorderLayout(10, 10));
-        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-        panel.add(welcomeLabel, BorderLayout.CENTER);
-        panel.add(btnSair, BorderLayout.SOUTH);
+        JMenu menuSistema = new JMenu("Sistema");
+        JMenuItem miSair = new JMenuItem("Sair");
+        menuSistema.add(miSair);
 
-        setContentPane(panel);
+        menuBar.add(menuUsuarios);
+        menuBar.add(Box.createHorizontalGlue());
+        menuBar.add(menuSistema);
+        setJMenuBar(menuBar);
+
+        JLabel lbl = new JLabel("Painel do Administrador", SwingConstants.CENTER);
+        lbl.setFont(new Font("SansSerif", Font.BOLD, 18));
+
+        setLayout(new BorderLayout());
+        add(lbl, BorderLayout.CENTER);
+
+        miListar.addActionListener(e ->
+                JOptionPane.showMessageDialog(this, "Listar usuários (implemente com tabela)."));
+        miRemover.addActionListener(e ->
+                JOptionPane.showMessageDialog(this, "Remover usuário (implemente busca e remoção)."));
+        miSair.addActionListener(e -> dispose());
     }
 }
+
 
 class TelaUsuario extends JFrame {
     public TelaUsuario(User user) {
