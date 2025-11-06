@@ -1,0 +1,13 @@
+# Tela de Feedback - Sistema de Questionários
+
+## Descrição
+Tela de feedback que exibe resultados agregados de pesquisas respondidas pelos usuários.
+
+## Funcionalidades
+- Exibição de gráficos interativos (barras e pizza)
+- Modo noturno (acessibilidade)
+- Mensagens personalizadas
+- Tratamento de erros para pesquisas não concluídas
+- Design responsivo
+
+## Estrutura de Arquivos
