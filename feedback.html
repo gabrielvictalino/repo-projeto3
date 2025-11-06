@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feedback - Sistema de Questionários</title>
+    <link rel="stylesheet" th:href="@{/css/feedback.css}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">QuestionárioPro</div>
+            <div class="user-menu">
+                <div class="accessibility-controls">
+                    <button id="darkModeToggle" class="btn btn-outline">Modo Noturno</button>
+                </div>
+                <button class="btn btn-outline notification-badge" onclick="viewNotifications()">Notificações</button>
+                <button class="btn btn-primary" onclick="logout()">Sair</button>
+            </div>
+        </header>
+
+        <main>
+            <!-- Conteúdo de Feedback (quando pesquisa foi concluída) -->
+            <div id="feedbackContent" class="feedback-container" th:if="${surveyCompleted}">
+                <div class="feedback-header">
+                    <h1 class="feedback-title">Feedback da Pesquisa</h1>
+                    <p class="feedback-subtitle">Resultados agregados das respostas coletadas</p>
+                </div>
+
+                <div class="thank-you-message">
+                    Obrigado, <span id="userName" th:text="${userName}">Usuário</span>! Sua participação é muito importante para nós.
+                </div>
+
+                <div class="charts-container">
+                    <div class="chart-card">
+                        <h3 class="chart-title">Distribuição de Respostas</h3>
+                        <div class="chart">
+                            <div class="bar-chart" id="barChart">
+                                <!-- Barras serão geradas via JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="chart-card">
+                        <h3 class="chart-title">Satisfação Geral</h3>
+                        <div class="chart">
+                            <div class="pie-chart" id="pieChart">
+                                <div class="pie-center"></div>
+                            </div>
+                        </div>
+                        <div class="legend" id="pieLegend">
+                            <!-- Legenda será gerada via JavaScript -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="additional-stats">
+                    <div class="stat-card">
+                        <h4>Taxa de Resposta</h4>
+                        <div class="stat-value" th:text="${responseRate} + '%'">75%</div>
+                    </div>
+                    <div class="stat-card">
+                        <h4>Total de Participantes</h4>
+                        <div class="stat-value" th:text="${totalParticipants}">150</div>
+                    </div>
+                    <div class="stat-card">
+                        <h4>Tempo Médio de Resposta</h4>
+                        <div class="stat-value" th:text="${averageTime}">8 min</div>
+                    </div>
+                </div>
+
+                <div class="feedback-actions">
+                    <button class="btn btn-primary" onclick="goToHomePage()">Responder Outra Pesquisa</button>
+                    <button class="btn btn-outline" onclick="viewDetailedResults()">Ver Resultados Detalhados</button>
+                </div>
+            </div>
+
+            <!-- Conteúdo de Erro (quando pesquisa não foi concluída) -->
+            <div id="errorContent" class="feedback-container" th:unless="${surveyCompleted}">
+                <div class="error-message">
+                    <h2>Pesquisa Não Concluída</h2>
+                    <p>Você precisa concluir a pesquisa antes de acessar o feedback. Por favor, finalize suas respostas para visualizar os resultados.</p>
+                </div>
+                <div class="feedback-actions">
+                    <button class="btn btn-primary" onclick="goToQuestionnaire()">Continuar Pesquisa</button>
+                    <button class="btn btn-outline" onclick="goToHomePage()">Voltar para Página Inicial</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script th:src="@{/js/feedback.js}"></script>
+    <script>
+        
+        const feedbackData = {
+            surveyTitle: /*[[${surveyTitle}]]*/ 'Título da Pesquisa',
+            barChartData: /*[[${barChartData}]]*/ [
+                { label: 'Pergunta 1', value: 75 },
+                { label: 'Pergunta 2', value: 60 },
+                { label: 'Pergunta 3', value: 85 },
+                { label: 'Pergunta 4', value: 45 },
+                { label: 'Pergunta 5', value: 90 }
+            ],
+            pieChartData: /*[[${pieChartData}]]*/ [
+                { label: 'Muito Satisfeito', value: 30, color: 'var(--primary-color)' },
+                { label: 'Satisfeito', value: 30, color: 'var(--secondary-color)' },
+                { label: 'Neutro', value: 25, color: 'var(--warning-color)' },
+                { label: 'Insatisfeito', value: 15, color: 'var(--danger-color)' }
+            ]
+        };
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeFeedbackPage();
+        });
+    </script>
+</body>
+</html>
