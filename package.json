@@ -1,0 +1,11 @@
+{
+  "name": "repo-projeto3-root-scripts",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "cd frontend-react && npm start",
+    "start": "cd frontend-react && npm start",
+    "install-frontend": "cd frontend-react && npm install"
+  },
+  "dependencies": {}
+}
