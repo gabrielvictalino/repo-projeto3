@@ -1,10 +1,14 @@
 package com.example.PROJ3.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class Notificacao {
     private int id;
     private String mensagem;
