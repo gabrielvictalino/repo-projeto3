@@ -11,7 +11,8 @@ export default function Logon({ onLogin }: { onLogin: (user: { name: string; tok
 
   useEffect(() => {
     // simulate loading (e.g., fetching config) before showing login
-    const t = setTimeout(() => setLoading(false), 700);
+    // increased by ~1s per request: originally 700ms, now 1700ms
+    const t = setTimeout(() => setLoading(false), 1700);
     return () => clearTimeout(t);
   }, []);
 
