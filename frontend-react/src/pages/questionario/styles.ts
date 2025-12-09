@@ -26,33 +26,41 @@ const css = `
 
 .sr-app{ display:flex; flex-direction:column; min-height:100vh; font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; background: var(--sr-bg); color: var(--sr-text) }
 .r-sans{ font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto }
-.sr-main{ flex:1; padding:36px; background:var(--sr-bg) }
-.sr-editor, .sr-responder, .sr-results, .sr-respondents{ max-width:1000px; background:var(--sr-surface); padding:28px; border-radius:4px; box-shadow:0 2px 10px rgba(16,24,40,0.1); margin:20px auto; border: 1px solid var(--sr-border) }
-.sr-editor h2, .sr-responder h2, .sr-results h2, .sr-respondents h2{ color:var(--sr-text); margin-top:0; font-size:20px; font-weight:600 }
-.field{ margin-bottom:14px }
-.field label{ display:block; font-size:13px; margin-bottom:8px; color:var(--sr-text) }
-.field input[type=text], .field input, .field select{ width:100%; padding:12px 14px; border-radius:4px; border:1px solid var(--sr-border); background:var(--sr-surface); box-shadow:none; color:var(--sr-text) }
+.sr-main{ flex:1; padding:40px 24px; background:var(--sr-bg); min-height: calc(100vh - var(--header-height) - var(--footer-height)) }
+.sr-editor, .sr-responder, .sr-results, .sr-respondents{ max-width:1100px; background:var(--sr-surface); padding:36px 40px; border-radius:10px; box-shadow:0 3px 15px rgba(0,75,141,0.08); margin:24px auto; border:1px solid var(--sr-border) }
+.sr-editor h2, .sr-responder h2, .sr-results h2, .sr-respondents h2{ color:var(--sr-text); margin-top:0; font-size:24px; font-weight:700; margin-bottom:28px }
+.field{ margin-bottom:20px }
+.field label{ display:block; font-size:14px; margin-bottom:9px; color:var(--sr-text); font-weight:600 }
+.field input[type=text], .field input, .field select{ width:100%; padding:13px 15px; border-radius:8px; border:1px solid var(--sr-border); background:var(--sr-surface); box-shadow:0 1px 3px rgba(0,0,0,0.04); color:var(--sr-text); font-size:15px; transition: all 0.2s ease }
+.field input:focus, .field select:focus{ outline:none; border-color:var(--sr-blue); box-shadow:0 0 0 3px rgba(59,130,246,0.1) }
 .mcq label{ display:block; margin-bottom:8px; color:var(--sr-text) }
-.actions{ margin-top:18px; display:flex; gap:12px }
-.primary{ background:var(--sr-blue); color:white; border:none; padding:12px 18px; border-radius:4px; cursor:pointer; box-shadow:0 2px 8px rgba(0,75,141,0.1); font-weight:600; transition: all 0.2s ease }
-.secondary{ background:transparent; border:1px solid var(--sr-border); color:var(--sr-blue); padding:10px 16px; border-radius:4px; cursor:pointer; transition: all 0.2s ease }
+.actions{ margin-top:28px; display:flex; gap:14px; padding-top:20px; border-top:1px solid var(--sr-border) }
+.primary{ background:var(--sr-blue); color:white; border:none; padding:13px 26px; border-radius:8px; cursor:pointer; box-shadow:0 3px 10px rgba(0,75,141,0.15); font-weight:600; font-size:15px; transition: all 0.2s ease }
+.primary:hover{ opacity:0.9; transform:translateY(-1px); box-shadow:0 5px 14px rgba(0,75,141,0.25) }
+.secondary{ background:transparent; border:2px solid var(--sr-blue); color:var(--sr-blue); padding:11px 24px; border-radius:8px; cursor:pointer; font-weight:600; font-size:15px; transition: all 0.2s ease }
+.secondary:hover{ background:var(--sr-border); transform:translateY(-1px) }
 .questions-list ol{ padding-left:18px }
 .questions-list .opts{ font-size:13px; color:var(--sr-text-secondary) }
-.q-cards{ display:flex; flex-direction:column; gap:12px }
-.q-card{ border:1px solid var(--sr-border); padding:14px; border-radius:4px; background:var(--sr-surface) }
+.q-cards{ display:flex; flex-direction:column; gap:18px; margin-top:20px }
+.q-card{ border:1px solid var(--sr-border); padding:22px; border-radius:10px; background:var(--sr-surface); box-shadow:0 2px 8px rgba(0,0,0,0.04); transition:all 0.2s ease }
+.q-card:hover{ box-shadow:0 4px 14px rgba(0,75,141,0.08); border-color:var(--sr-blue) }
 .q-card.draggable{ cursor:grab }
-.q-top{ display:flex; justify-content:space-between; align-items:flex-start; gap:12px }
-.q-title{ font-weight:600; color:var(--sr-text) }
+.q-top{ display:flex; justify-content:space-between; align-items:flex-start; gap:14px; margin-bottom:14px }
+.q-title{ font-weight:600; color:var(--sr-text); font-size:16px }
 .q-title .req{ color:#dc2626; margin-left:6px }
-.q-actions button{ background:transparent; border:none; color:var(--sr-blue); cursor:pointer; margin-left:8px }
-.q-opts{ margin-top:10px; color:var(--sr-text) }
-.opt{ padding:6px 0 }
+.q-actions{ display:flex; gap:6px }
+.q-actions button{ background:transparent; border:none; color:var(--sr-blue); cursor:pointer; padding:6px 10px; border-radius:6px; transition:all 0.2s ease; font-size:20px }
+.q-actions button:hover{ background:var(--sr-border) }
+.q-opts{ margin-top:12px; color:var(--sr-text) }
+.opt{ padding:9px 0; font-size:15px }
 
-.q-card.responder{ padding:18px }
-.q-card.responder .q-title{ font-size:16px }
-.q-card.responder .q-body{ margin-top:10px }
-.mcq-item{ display:flex; align-items:center; gap:8px; padding:8px 0 }
-.mcq-item input{ margin-right:8px }
+.q-card.responder{ padding:24px; background:var(--sr-surface) }
+.q-card.responder .q-title{ font-size:17px; color:var(--sr-text); font-weight:600 }
+.q-card.responder .q-body{ margin-top:14px }
+.mcq-item{ display:flex; align-items:center; gap:10px; padding:10px; border-radius:6px; transition:background 0.2s ease }
+.mcq-item:hover{ background:#ffffff }
+.mcq-item input{ margin-right:8px; width:18px; height:18px; cursor:pointer }
+.mcq-item label{ cursor:pointer; font-size:15px }
 .req{ color:#ef4444; margin-left:6px }
 
 /* editor two-column preview layout */

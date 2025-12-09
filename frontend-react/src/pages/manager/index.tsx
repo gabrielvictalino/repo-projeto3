@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import type { User } from '../../types/user';
 import injectManagerStyles from './styles';
+import { UserIcon, ManagerIcon, TrashIcon, ChartIcon } from '../../components/Icons';
 
 injectManagerStyles();
 
@@ -121,7 +122,9 @@ export default function ManagerPanel() {
                       <td className="user-email">{user.email || '—'}</td>
                       <td>
                         <span className={`role-badge ${user.role}`}>
-                          {user.role === 'manager' ? '👔 Manager' : '👤 Cliente'}
+                          <span style={{display: 'flex', alignItems: 'center', gap: 6}}>
+                            {user.role === 'manager' ? <><ManagerIcon size={14} /> Manager</> : <><UserIcon size={14} /> Cliente</>}
+                          </span>
                         </span>
                       </td>
                       <td className="user-date">
@@ -140,7 +143,7 @@ export default function ManagerPanel() {
                           onClick={() => deleteUser(user.id)}
                           title="Remover usuário"
                         >
-                          🗑️
+                          <TrashIcon size={14} />
                         </button>
                       </td>
                     </tr>
@@ -153,7 +156,7 @@ export default function ManagerPanel() {
 
         <section className="manager-section">
           <div className="section-header">
-            <h3>📊 Estatísticas</h3>
+            <h3 style={{display: 'flex', alignItems: 'center', gap: 8}}><ChartIcon size={20} /> Estatísticas</h3>
           </div>
           <div className="stats-grid">
             <div className="stat-card">
@@ -167,7 +170,7 @@ export default function ManagerPanel() {
               <div className="stat-label">Managers</div>
             </div>
             <div className="stat-card">
-              <div className="stat-icon">👤</div>
+              <div className="stat-icon"><UserIcon size={24} /></div>
               <div className="stat-value">{users.filter(u => u.role === 'cliente').length}</div>
               <div className="stat-label">Clientes</div>
             </div>

@@ -1,7 +1,18 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import injectHeaderStyles from './styles';
+import injectHeaderStyles from './styles-new';
 import type { User } from '../../../types/user';
+import { 
+  HomeIcon, 
+  PlusIcon, 
+  ChartIcon, 
+  UsersIcon, 
+  DocumentIcon, 
+  KeyIcon,
+  SearchIcon,
+  BellIcon,
+  LogoutIcon
+} from '../../../components/Icons';
 
 injectHeaderStyles();
 
@@ -25,22 +36,22 @@ export default function Header({ subtitle, onLogin, user, onLogout }: HeaderProp
   const getNavItems = () => {
     if (isManager) {
       return [
-        { path: '/gerenciar', label: '🏠 Painel', icon: '🏠' },
-        { path: '/criar', label: '➕ Criar', icon: '➕' },
-        { path: '/resultados', label: '📊 Resultados', icon: '📊' },
-        { path: '/respondentes', label: '👥 Respondentes', icon: '👥' },
+        { path: '/gerenciar', label: 'Painel', icon: <HomeIcon /> },
+        { path: '/criar', label: 'Criar', icon: <PlusIcon /> },
+        { path: '/resultados', label: 'Resultados', icon: <ChartIcon /> },
+        { path: '/respondentes', label: 'Respondentes', icon: <UsersIcon /> },
       ];
     } else if (isCliente) {
       return [
-        { path: '/home', label: '🏠 Início', icon: '🏠' },
-        { path: '/responder', label: '📝 Questionários', icon: '📝' },
-        { path: '/meus-resultados', label: '📊 Minhas Respostas', icon: '📊' },
+        { path: '/home', label: 'Início', icon: <HomeIcon /> },
+        { path: '/responder', label: 'Questionários', icon: <DocumentIcon /> },
+        { path: '/meus-resultados', label: 'Respostas', icon: <ChartIcon /> },
       ];
     } else {
       return [
-        { path: '/', label: '🏠 Início', icon: '🏠' },
-        { path: '/responder', label: '📝 Questionários', icon: '📝' },
-        { path: '/login', label: '🔑 Entrar', icon: '🔑' },
+        { path: '/', label: 'Início', icon: <HomeIcon /> },
+        { path: '/responder', label: 'Questionários', icon: <DocumentIcon /> },
+        { path: '/login', label: 'Entrar', icon: <KeyIcon /> },
       ];
     }
   };
@@ -49,6 +60,7 @@ export default function Header({ subtitle, onLogin, user, onLogout }: HeaderProp
 
   return (
     <header className="sr-header">
+      {/* Logo and Title */}
       <div className="brand" onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
         <div className="logo" />
         <div>
@@ -57,7 +69,7 @@ export default function Header({ subtitle, onLogin, user, onLogout }: HeaderProp
         </div>
       </div>
 
-      {/* Navigation */}
+      {/* Navigation Menu */}
       <nav className="header-nav">
         {navItems.map(item => (
           <button
@@ -71,16 +83,16 @@ export default function Header({ subtitle, onLogin, user, onLogout }: HeaderProp
         ))}
       </nav>
 
+      {/* Search */}
       <div className="header-center">
-        {/* Search bar */}
         {user && (
           <div className={`search-container ${showSearch ? 'expanded' : ''}`}>
             <button 
               className="search-toggle" 
               onClick={() => setShowSearch(!showSearch)}
-              title="Buscar questionários"
+              title="Buscar"
             >
-              🔍
+              <SearchIcon size={18} />
             </button>
             {showSearch && (
               <input 
@@ -96,21 +108,31 @@ export default function Header({ subtitle, onLogin, user, onLogout }: HeaderProp
         )}
       </div>
 
+      {/* Actions: Bell, Profile, Logout */}
       <div className="actions">
-        {/* notification bell */}
-        <button className="sr-bell" title="Notificações" aria-label="Notificações">🔔<span className="badge">0</span></button>
-        {user ? (
-          <div className="user" title="Sair" onClick={() => onLogout && onLogout()} style={{ cursor: 'pointer' }}>
-            <div className="avatar" />
-            <div>
-              <div style={{ fontWeight: 600 }}>{user.name}</div>
-              <div style={{ fontSize: 11, opacity: 0.8 }}>
-                {user.role === 'manager' ? '👔 Manager' : '👤 Cliente'}
-              </div>
-            </div>
-          </div>
-        ) : (
-          <button className="primary" onClick={() => onLogin && onLogin()}>Entrar</button>
+        {user && (
+          <>
+            <button className="header-btn bell-btn" title="Notificações">
+              <BellIcon size={18} />
+              {/* <span className="badge">3</span> */}
+            </button>
+            <button className="header-btn profile-info" onClick={() => navigate('/perfil')} title="Ver perfil">
+              <img 
+                src={user.avatarUrl || 'https://via.placeholder.com/28'} 
+                alt={user.name} 
+                className="user-avatar" 
+              />
+              <span className="user-text">{user.name}</span>
+            </button>
+            <button className="header-btn logout-icon" onClick={() => onLogout && onLogout()} title="Sair">
+              <LogoutIcon size={18} />
+            </button>
+          </>
+        )}
+        {!user && (
+          <button className="header-btn btn-login" onClick={() => onLogin && onLogin()}>
+            Entrar
+          </button>
         )}
       </div>
     </header>

@@ -16,21 +16,21 @@
   --sr-border: #e3e8ee;
 }
 
-/* Dark theme */
+/* Dark theme - azul marinho escuro */
 [data-theme="dark"]{
-  --sr-blue: #3b82f6;
+  --sr-blue: #4a90e2;
   --sr-accent: #fbbf24;
   --sr-teal: #14b8a6;
-  --sr-bg: #1a1a1a;
-  --sr-surface: #2a2a2a;
-  --sr-text: #e5e5e5;
-  --sr-text-secondary: #a3a3a3;
-  --sr-border: #404040;
+  --sr-bg: #0a1628;
+  --sr-surface: #162843;
+  --sr-text: #e1e8f0;
+  --sr-text-secondary: #8fa3bf;
+  --sr-border: #253a5a;
 }
 
 [data-theme="dark"] body{
-  background: var(--sr-bg);
-  color: var(--sr-text);
+  background: #0a1628 !important;
+  color: #e1e8f0 !important;
 }
 
 /* Floating theme toggle button */

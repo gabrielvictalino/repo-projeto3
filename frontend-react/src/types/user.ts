@@ -7,6 +7,7 @@ export interface User {
   role: UserRole;
   token?: string;
   createdAt?: string;
+  avatarUrl?: string;
 }
 
 export interface UserContextType {

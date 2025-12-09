@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
 import injectQuestionarioStyles from './styles';
+import { EditIcon, TrashIcon, UserIcon, LightBulbIcon } from '../../components/Icons';
 
 injectQuestionarioStyles();
 
@@ -200,21 +201,21 @@ function Editor({ onSave }: { onSave: (qs: Question[]) => void }) {
                     }}
                     title="Editar questionário"
                   >
-                    ✏️
+                    <EditIcon size={16} />
                   </button>
                   <button 
                     className="editor-btn-delete"
                     onClick={(e) => deleteQuestionnaireFromEditor(q.id, e)}
                     title="Excluir questionário"
                   >
-                    🗑️
+                    <TrashIcon size={16} />
                   </button>
                 </div>
               </div>
             ))}
           </div>
           <div className="editor-selection-hint">
-            <p>💡 Clique em um questionário para editá-lo ou crie um novo do zero</p>
+            <p style={{display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center'}}><LightBulbIcon size={18} /> Clique em um questionário para editá-lo ou crie um novo do zero</p>
           </div>
         </div>
       )}
@@ -501,14 +502,14 @@ function Responder({ questions, onSubmit, currentUser, isManager }: { questions:
                         onClick={(e) => { e.stopPropagation(); editQuestionnaire(q.id); }}
                         title="Editar questionário"
                       >
-                        ✏️
+                        <EditIcon size={14} />
                       </button>
                       <button 
                         className="btn-delete-quiz" 
                         onClick={(e) => { e.stopPropagation(); deleteQuestionnaire(q.id); }}
                         title="Deletar questionário"
                       >
-                        🗑️
+                        <TrashIcon size={14} />
                       </button>
                     </div>
                   )}
@@ -653,7 +654,7 @@ function Respondents({ responses }: { responses: any[] }){
         {responses.map(r=>(
           <li key={r.id}>
             <strong>{r.userName || 'Anônimo'}</strong> 
-            {r.userId === 'guest' && <span style={{color: 'var(--sr-teal)', fontSize: 12, marginLeft: 8}}>👤 Visitante</span>}
+            {r.userId === 'guest' && <span style={{color: 'var(--sr-teal)', fontSize: 12, marginLeft: 8, display: 'inline-flex', alignItems: 'center', gap: 4}}><UserIcon size={12} /> Visitante</span>}
             {' '}— {Object.keys(r.answers).length} respostas
             {r.timestamp && <span style={{fontSize: 11, opacity: 0.7, marginLeft: 8}}>({new Date(r.timestamp).toLocaleString()})</span>}
           </li>

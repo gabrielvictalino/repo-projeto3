@@ -34,11 +34,12 @@ const css = `
 }
 
 .manager-section {
-  background: white;
+  background: var(--sr-surface);
   border-radius: 4px;
   padding: 32px;
   box-shadow: 0 2px 8px rgba(16, 24, 40, 0.04);
-  border: 1px solid rgba(0, 75, 141, 0.06);
+  border: 1px solid var(--sr-border);
+  transition: all 0.3s ease;
 }
 
 .section-header {
@@ -47,13 +48,13 @@ const css = `
   align-items: center;
   margin-bottom: 24px;
   padding-bottom: 16px;
-  border-bottom: 2px solid var(--sr-bg);
+  border-bottom: 2px solid var(--sr-border);
 }
 
 .section-header h3 {
   margin: 0;
   font-size: 24px;
-  color: var(--sr-blue);
+  color: var(--sr-text);
   font-weight: 600;
 }
 
@@ -79,7 +80,7 @@ const css = `
   padding: 24px;
   border-radius: 4px;
   margin-bottom: 24px;
-  border: 1px solid rgba(0, 75, 141, 0.06);
+  border: 1px solid var(--sr-border);
 }
 
 .form-row {
@@ -98,17 +99,18 @@ const css = `
   font-size: 13px;
   font-weight: 600;
   margin-bottom: 8px;
-  color: var(--sr-blue);
+  color: var(--sr-text);
 }
 
 .add-user-form input,
 .add-user-form select {
   width: 100%;
   padding: 12px;
-  border: 1px solid #e6eef8;
+  border: 1px solid var(--sr-border);
   border-radius: 4px;
   font-size: 14px;
-  background: white;
+  background: var(--sr-surface);
+  color: var(--sr-text);
   transition: all 0.2s ease;
 }
 
@@ -149,35 +151,36 @@ const css = `
   text-align: left;
   padding: 14px 16px;
   background: var(--sr-bg);
-  color: var(--sr-blue);
+  color: var(--sr-text);
   font-weight: 600;
   font-size: 14px;
-  border-bottom: 2px solid rgba(0, 75, 141, 0.1);
+  border-bottom: 2px solid var(--sr-border);
 }
 
 .users-table td {
   padding: 16px;
-  border-bottom: 1px solid #f1f5f9;
+  border-bottom: 1px solid var(--sr-border);
   font-size: 14px;
-  color: #374151;
+  color: var(--sr-text-secondary);
 }
 
 .users-table tbody tr:hover {
-  background: #f9fbff;
+  background: var(--sr-bg);
 }
 
 .user-name {
   font-weight: 600;
-  color: var(--sr-blue);
+  color: var(--sr-text);
 }
 
 .user-email {
-  color: #6b7280;
+  color: var(--sr-text-secondary);
 }
 
 .user-date {
-  color: #9ca3af;
+  color: var(--sr-text-secondary);
   font-size: 13px;
+  opacity: 0.8;
 }
 
 .role-badge {
@@ -225,7 +228,7 @@ const css = `
 .empty-state {
   text-align: center;
   padding: 48px 24px;
-  color: #9ca3af;
+  color: var(--sr-text-secondary);
   font-size: 16px;
 }
 
@@ -236,8 +239,8 @@ const css = `
 }
 
 .stat-card {
-  background: linear-gradient(135deg, #f9fafb, #ffffff);
-  border: 1px solid rgba(0, 75, 141, 0.08);
+  background: var(--sr-bg);
+  border: 1px solid var(--sr-border);
   border-radius: 4px;
   padding: 28px;
   text-align: center;
@@ -252,6 +255,7 @@ const css = `
 .stat-icon {
   font-size: 48px;
   margin-bottom: 16px;
+  opacity: 0.9;
 }
 
 .stat-value {
@@ -263,7 +267,7 @@ const css = `
 
 .stat-label {
   font-size: 14px;
-  color: #6b7280;
+  color: var(--sr-text-secondary);
   font-weight: 500;
 }
 

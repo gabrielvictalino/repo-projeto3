@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import injectLogonStyles from './styles';
 import type { User, UserRole } from '../../types/user';
 import { validateCredentials } from '../../data/defaultUsers';
+import { LightBulbIcon } from '../../components/Icons';
 
 injectLogonStyles();
 
@@ -51,41 +52,76 @@ export default function Logon({ onLogin }: { onLogin: (user: User) => void }) {
   return (
     <div className="logon-split">
       <div className="logon-top" />
-      <div className="logon-bottom" />
+      
+      {/* SEBRAE Logo Header */}
+      <div className="logon-header">
+        <svg className="logo-sebrae" viewBox="0 0 200 60" fill="white">
+          <rect x="20" y="10" width="160" height="8" />
+          <text x="100" y="35" textAnchor="middle" fontSize="24" fontWeight="bold" fill="white">SEBRAE</text>
+          <rect x="20" y="42" width="160" height="8" />
+        </svg>
+        <div className="logon-header-text">
+          Para acessar as soluções do Sebrae e parceiros, insira seu CPF ou E-mail<br/>
+          cadastrados ou crie uma conta. É rapidinho!
+        </div>
+      </div>
+
       <div className="logon-wrapper">
         <div className="logon-card">
-            <h2>Entrar</h2>
+            <h2>Login</h2>
             <div className="field">
-              <label>Nome</label>
+              <label>CPF</label>
               <input value={name} onChange={e => setName(e.target.value)} placeholder="Seu nome" />
             </div>
             <div className="field">
               <label>Senha</label>
               <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Senha" />
             </div>
-            <div className="field">
-              <label>Entrar como</label>
-              <select value={role} onChange={e => setRole(e.target.value as UserRole)}>
-                <option value="cliente">👤 Cliente</option>
-                <option value="manager">👔 Manager</option>
-              </select>
+            
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
+              <div className="remember-row">
+                <input type="checkbox" id="remember" />
+                <label htmlFor="remember">Lembre-se de mim</label>
+              </div>
+              <a href="#" className="forgot-link">Esqueceu sua senha?</a>
             </div>
-            {error && <div style={{ color: 'crimson', marginTop: 8 }}>{error}</div>}
-            <div style={{ fontSize: 11, color: '#6b7280', marginTop: 8, lineHeight: 1.5 }}>
-              💡 <strong>Credenciais de teste:</strong><br/>
-              Manager: <code>admin/admin123</code> ou <code>manager/manager123</code><br/>
-              Cliente: <code>cliente1/cliente123</code> ou <code>joao/joao123</code>
-            </div>
+
+            {error && <div style={{ color: 'crimson', marginTop: 8, marginBottom: 16 }}>{error}</div>}
+            
             <div className="actions">
               <button className="primary" onClick={submit}>Entrar</button>
             </div>
-            <div className="social-row" aria-hidden>
-              <div className="social-dot"><span>G</span></div>
-              <div className="social-dot"><span>I</span></div>
-              <div className="social-dot small"><span>F</span></div>
+
+            <div className="social-divider">
+              <span>Se preferir, entre com outras contas:</span>
+            </div>
+
+            <div className="social-row">
+              <div className="social-dot"><span>🔵</span></div>
+              <div className="social-dot"><span>📧</span></div>
+              <div className="social-dot"><span>🔗</span></div>
+              <div className="social-dot"><span>📱</span></div>
+              <div className="social-dot small"><span>📘</span></div>
+            </div>
+
+            <div className="register-section">
+              <p>Ainda não tem uma conta Sebrae?</p>
+              <a href="#" className="btn-register">Cadastre-se</a>
+            </div>
+
+            <div style={{ fontSize: 11, color: '#6b7280', marginTop: 16, lineHeight: 1.5, textAlign: 'center' }}>
+              <span style={{display: 'inline-flex', alignItems: 'center', gap: 6}}><LightBulbIcon size={16} /> <strong>Credenciais de teste:</strong></span><br/>
+              Manager: <code>admin/admin123</code> ou <code>manager/manager123</code><br/>
+              Cliente: <code>cliente1/cliente123</code> ou <code>joao/joao123</code>
             </div>
           </div>
-        </div>
+      </div>
+
+      {/* Help Bubble */}
+      <div className="help-bubble">
+        <h4>Tem algum problema para entrar na sua conta?</h4>
+        <p>Acesse a nossa página <a href="#" className="sac-link">SAC</a></p>
+      </div>
     </div>
   );
 }

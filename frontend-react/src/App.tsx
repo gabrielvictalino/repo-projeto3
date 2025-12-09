@@ -5,10 +5,12 @@ import QuestionarioPage from './pages/questionario/index';
 import Logon from './pages/login/index';
 import HomePage from './pages/home/index';
 import ManagerPanel from './pages/manager/index';
+import Perfil from './pages/perfil';
 import Header from './pages/shared/header/index';
 import Footer from './pages/shared/footer/index';
 import type { Question } from './pages/questionario/index';
 import type { User } from './types/user';
+import { MoonIcon, SunIcon } from './components/Icons';
 
 type View = 'criar' | 'responder' | 'resultados' | 'respondentes';
 
@@ -82,6 +84,9 @@ function App() {
           <Routes>
             <Route path="/login" element={<Logon onLogin={(u) => { setUser(u); try{ localStorage.setItem('sr_user', JSON.stringify(u)); }catch(e){} navigate(u.role === 'manager' ? '/gerenciar' : '/home'); }} />} />
             
+            {/* Shared routes for authenticated users */}
+            {user && <Route path="/perfil" element={<Perfil user={user} onLogout={handleLogout} />} />}
+            
             {/* Manager routes */}
             {isManager && (
               <>
@@ -116,7 +121,7 @@ function App() {
         title={theme === 'light' ? 'Mudar para modo escuro' : 'Mudar para modo claro'}
         aria-label="Alternar tema"
       >
-        {theme === 'light' ? '🌙' : '☀️'}
+        {theme === 'light' ? <MoonIcon size={22} /> : <SunIcon size={22} />}
       </button>
     </div>
   );

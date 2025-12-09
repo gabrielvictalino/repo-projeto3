@@ -3,33 +3,21 @@ const css = `
   --header-height: 56px;
 }
 
-/* Reset for header */
-.sr-header, 
-.sr-header *, 
-.sr-header *::before, 
-.sr-header *::after {
-  border: none !important;
-  outline: none !important;
-  box-shadow: none;
-  text-decoration: none !important;
-}
-
-/* Header Container */
 .sr-header{ 
-  display: flex !important; 
-  align-items: center !important; 
-  justify-content: space-between !important; 
-  gap: 20px !important; 
-  padding: 12px 40px !important; 
-  background: linear-gradient(120deg, var(--sr-blue) 0%, #0066b3 100%) !important; 
-  color: white !important; 
-  box-shadow: 0 2px 8px rgba(0,75,141,0.15) !important; 
-  height: var(--header-height) !important;
-  position: relative !important;
-  margin: 0 !important;
+  display: flex; 
+  align-items: center; 
+  justify-content: space-between; 
+  gap: 16px; 
+  padding: 11px 40px; 
+  background: linear-gradient(120deg, var(--sr-blue) 0%, #0066b3 100%); 
+  color: white; 
+  box-shadow: 0 2px 8px rgba(0,75,141,0.15); 
+  height: var(--header-height);
+  border: none;
+  outline: none;
+  margin: 0;
 }
 
-/* Brand Section */
 .sr-header .brand{ 
   display: flex; 
   align-items: center; 
@@ -61,7 +49,6 @@ const css = `
   font-weight: 500;
 }
 
-/* Navigation Menu */
 .header-nav{
   display: flex;
   align-items: center;
@@ -69,12 +56,13 @@ const css = `
   flex: 1;
   justify-content: center;
   max-width: 700px;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
 }
 
 .header-nav .nav-item{
   background: transparent;
-  border: none;
-  outline: none;
   color: rgba(255,255,255,0.9);
   padding: 6px 16px;
   border-radius: 6px;
@@ -86,7 +74,7 @@ const css = `
   align-items: center;
   gap: 8px;
   white-space: nowrap;
-  height: 32px;
+  height: 34px;
 }
 
 .header-nav .nav-item:hover{
@@ -120,12 +108,14 @@ const css = `
   transform: scale(1);
 }
 
-/* Search Section */
 .sr-header .header-center{
   display: flex;
   justify-content: flex-end;
   align-items: center;
   flex-shrink: 0;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
 }
 
 .search-container{
@@ -137,13 +127,11 @@ const css = `
 
 .search-toggle{
   background: rgba(255,255,255,0.1);
-  border: none;
-  outline: none;
   border-radius: 50%;
   color: white;
   cursor: pointer;
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -159,13 +147,12 @@ const css = `
 .search-input{
   padding: 6px 14px;
   border: 1px solid rgba(255,255,255,0.2);
-  border-radius: 20px;
+  border-radius: 17px;
   background: rgba(255,255,255,0.1);
   color: white;
   font-size: 13px;
   width: 250px;
-  height: 32px;
-  outline: none;
+  height: 34px;
   transition: all 0.2s ease;
 }
 
@@ -178,102 +165,102 @@ const css = `
   border-color: rgba(255,255,255,0.4);
 }
 
-/* Actions Section - Clean reset */
-.sr-header .actions *{
-  margin: 0;
-  padding: 0;
-}
-
 .sr-header .actions{ 
   display: flex;
-  gap: 12px;
   align-items: center;
+  gap: 8px;
   flex-shrink: 0;
+  border: none !important;
+  outline: none !important;
+  transform: translateY(-20px);
 }
 
-/* All action buttons base style */
-.sr-header .action-btn{
+/* Base button style - EXACTLY like nav-item */
+.sr-header .header-btn{
   background: rgba(255,255,255,0.1);
+  border: none;
+  outline: none;
   color: white;
-  font-family: inherit;
-  font-size: 14px;
+  padding: 6px 16px;
+  border-radius: 6px;
   cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  height: 34px;
+  margin: 0;
+  box-sizing: border-box;
+  position: relative;
+  top: -2px;
+}
+
+.sr-header .header-btn:hover{
+  background: rgba(255,255,255,0.15);
+}
+
+/* Bell button - circular */
+.sr-header .bell-btn,
+.sr-header .logout-icon{
+  padding: 0;
+  width: 34px;
+  border-radius: 50%;
+  gap: 0;
   justify-content: center;
   position: relative;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  flex-shrink: 0;
 }
 
-.sr-header .action-btn:hover{
-  background: rgba(255,255,255,0.15);
-  transform: scale(1.05);
-}
-
-.sr-header .action-btn svg{
-  flex-shrink: 0;
-}
-
-/* Badge */
-.sr-header .action-btn .badge{
+.sr-header .bell-btn .badge{
   position: absolute;
-  top: -3px;
-  right: -3px;
+  top: -2px;
+  right: -2px;
   background: var(--sr-accent);
   color: #004b8d;
   font-weight: 700;
-  font-size: 10px;
-  padding: 3px 6px;
-  border-radius: 10px;
-  min-width: 18px;
+  font-size: 9px;
+  padding: 2px 5px;
+  border-radius: 8px;
+  min-width: 16px;
   text-align: center;
   line-height: 1;
 }
 
-/* Profile Button */
-.sr-header .profile-btn{
-  width: auto;
-  padding: 4px 16px 4px 4px;
-  border-radius: 18px;
-  gap: 10px;
+/* Profile button - extended like nav-item */
+.sr-header .profile-info{
+  padding: 3px 14px 3px 3px;
+  gap: 9px;
+  border-radius: 17px;
 }
 
-.sr-header .profile-btn .avatar{
+.sr-header .profile-info .user-avatar{
   width: 28px;
   height: 28px;
   border-radius: 50%;
   object-fit: cover;
   background: rgba(255,255,255,0.2);
   flex-shrink: 0;
+  border: none;
 }
 
-.sr-header .profile-btn .user-name{
+.sr-header .profile-info .user-text{
   font-weight: 600;
-  font-size: 14px;
-  color: white;
-  white-space: nowrap;
-  line-height: 1;
 }
 
-/* Login Button */
-.sr-header .login-btn{
+/* Login button - accent colored like active nav */
+.sr-header .btn-login{
   background: var(--sr-accent);
   color: var(--sr-blue);
-  width: auto;
-  padding: 0 24px;
-  border-radius: 18px;
   font-weight: 600;
+  border-radius: 17px;
 }
 
-.sr-header .login-btn:hover{
-  transform: translateY(-1px);
+.sr-header .btn-login:hover{
+  background: #ffd900;
 }
 
-/* Responsive */
 @media (max-width: 920px){ 
   .sr-header{ 
     padding: 12px 20px;
@@ -295,23 +282,14 @@ const css = `
 }
 `;
 
-let injected = false;
 export default function injectHeaderStyles(){
-  // Force remove and re-inject
-  injected = false;
-  
   const oldStyle = document.querySelector('style[data-styles="shared-header"]');
   if (oldStyle) {
     oldStyle.remove();
   }
   
-  if (injected) return;
-  injected = true;
-  
   const el = document.createElement('style');
   el.setAttribute('data-styles','shared-header');
   el.innerHTML = css;
   document.head.appendChild(el);
-  
-  console.log('Header styles injected');
 }
