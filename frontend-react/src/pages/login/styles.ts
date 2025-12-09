@@ -12,13 +12,14 @@ const css = `
 
 /* rectangle (card) positioned centered on the split (straddles blue and white) */
 .logon-wrapper{ position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:100%; display:flex; justify-content:center; z-index:5 }
-.logon-card{ width:100%; max-width:640px; background:var(--sr-surface); padding:22px; border-radius:10px; box-shadow:0 18px 40px rgba(3,10,30,0.18) }
+.logon-card{ width:100%; max-width:640px; background:var(--sr-surface); padding:22px; border-radius:4px; box-shadow:0 8px 24px rgba(3,10,30,0.1) }
 .logon-card h2{ color:var(--sr-blue); margin:0 0 8px 0; text-align:center }
 .logon-card .field{ margin-top:10px }
 .logon-card .field label{ display:block; margin-bottom:6px; font-size:13px }
-.logon-card .field input{ width:100%; padding:10px; border-radius:8px; border:1px solid #e6eef8 }
+.logon-card .field input{ width:100%; padding:10px; border-radius:4px; border:1px solid #e6eef8 }
+.logon-card .field select{ width:100%; padding:10px; border-radius:4px; border:1px solid #e6eef8 }
 .logon-card .actions{ margin-top:14px; display:flex; justify-content:center }
-.primary{ background:var(--sr-blue); color:white; border:none; padding:10px 16px; border-radius:8px; cursor:pointer }
+.primary{ background:var(--sr-blue); color:white; border:none; padding:10px 16px; border-radius:4px; cursor:pointer; transition: all 0.2s ease }
 
 /* social dots aesthetics */
 .social-row{ margin-top:18px; display:flex; justify-content:center; gap:14px }

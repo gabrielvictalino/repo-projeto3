@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import injectLogonStyles from './styles';
+import type { User, UserRole } from '../../types/user';
+import { validateCredentials } from '../../data/defaultUsers';
 
 injectLogonStyles();
 
-export default function Logon({ onLogin }: { onLogin: (user: { name: string; token?: string }) => void }) {
+export default function Logon({ onLogin }: { onLogin: (user: User) => void }) {
   const [name, setName] = useState('');
   const [password, setPassword] = useState('');
+  const [role, setRole] = useState<UserRole>('cliente');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -20,9 +23,18 @@ export default function Logon({ onLogin }: { onLogin: (user: { name: string; tok
     setError(null);
     if (!name.trim()) { setError('Informe o nome de usuário'); return; }
     if (!password) { setError('Informe a senha'); return; }
-    // demo acceptance
-    onLogin({ name: name.trim(), token: 'demo-token' });
-    setName(''); setPassword('');
+    
+    // Validate against default users
+    const validUser = validateCredentials(name.trim(), password);
+    
+    if (!validUser) {
+      setError('Credenciais inválidas. Verifique nome e senha.');
+      return;
+    }
+    
+    onLogin(validUser);
+    setName(''); 
+    setPassword('');
   }
 
   if (loading) {
@@ -51,7 +63,19 @@ export default function Logon({ onLogin }: { onLogin: (user: { name: string; tok
               <label>Senha</label>
               <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Senha" />
             </div>
+            <div className="field">
+              <label>Entrar como</label>
+              <select value={role} onChange={e => setRole(e.target.value as UserRole)}>
+                <option value="cliente">👤 Cliente</option>
+                <option value="manager">👔 Manager</option>
+              </select>
+            </div>
             {error && <div style={{ color: 'crimson', marginTop: 8 }}>{error}</div>}
+            <div style={{ fontSize: 11, color: '#6b7280', marginTop: 8, lineHeight: 1.5 }}>
+              💡 <strong>Credenciais de teste:</strong><br/>
+              Manager: <code>admin/admin123</code> ou <code>manager/manager123</code><br/>
+              Cliente: <code>cliente1/cliente123</code> ou <code>joao/joao123</code>
+            </div>
             <div className="actions">
               <button className="primary" onClick={submit}>Entrar</button>
             </div>
