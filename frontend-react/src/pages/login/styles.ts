@@ -369,69 +369,100 @@ const css = `
 
 /* Help bubble */
 .help-bubble {
-  position: absolute;
-  right: 40px;
-  top: 50%;
-  transform: translateY(-50%);
-  background: white;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  max-width: 300px;
+  position: fixed;
+  right: -80px;
+  bottom: 20px;
   z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0;
+  max-width: 420px;
 }
 
-[data-theme="dark"] .help-bubble {
+.help-speech-bubble {
+  background: white;
+  padding: 20px 24px;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  position: relative;
+  margin-bottom: -10px;
+  margin-right: 100px;
+  z-index: 2;
+}
+
+[data-theme="dark"] .help-speech-bubble {
   background: #2a2a2a;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
 }
 
-.help-bubble:before {
+.help-speech-bubble:after {
   content: '';
   position: absolute;
-  left: -10px;
-  top: 50%;
-  transform: translateY(-50%);
+  bottom: -15px;
+  left: 80px;
   width: 0;
   height: 0;
   border-style: solid;
-  border-width: 10px 10px 10px 0;
-  border-color: transparent white transparent transparent;
+  border-width: 15px 0 0 15px;
+  border-color: white transparent transparent transparent;
 }
 
-[data-theme="dark"] .help-bubble:before {
-  border-color: transparent #2a2a2a transparent transparent;
+[data-theme="dark"] .help-speech-bubble:after {
+  border-color: #2a2a2a transparent transparent transparent;
 }
 
-.help-bubble h4 {
+.help-speech-bubble h4 {
   margin: 0 0 8px 0;
   font-size: 14px;
   color: #1f2937;
+  font-weight: 600;
+  line-height: 1.4;
 }
 
-[data-theme="dark"] .help-bubble h4 {
+[data-theme="dark"] .help-speech-bubble h4 {
   color: #e5e5e5;
 }
 
-.help-bubble p {
+.help-speech-bubble p {
   margin: 0;
   font-size: 13px;
   color: #6b7280;
   line-height: 1.5;
 }
 
-[data-theme="dark"] .help-bubble p {
+[data-theme="dark"] .help-speech-bubble p {
   color: #9ca3af;
 }
 
-.help-bubble .sac-link {
+.help-speech-bubble .sac-link {
   color: var(--sr-blue);
   font-weight: 600;
   text-decoration: none;
 }
 
-.help-bubble .sac-link:hover {
+.help-speech-bubble .sac-link:hover {
   text-decoration: underline;
+}
+
+.help-illustration {
+  width: 280px;
+  height: 280px;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+  margin-right: 0;
+}
+
+.help-illustration img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 12px rgba(0, 75, 141, 0.15));
+}
+
+[data-theme="dark"] .help-illustration img {
+  filter: drop-shadow(0 4px 12px rgba(74, 158, 255, 0.2));
 }
 
 /* Character illustration */

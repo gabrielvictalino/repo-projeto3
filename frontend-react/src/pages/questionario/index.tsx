@@ -405,6 +405,17 @@ function Responder({ questions, onSubmit, currentUser, isManager }: { questions:
   const [answers, setAnswers] = useState<Record<string,string>>({});
   const [isResponding, setIsResponding] = useState(false);
 
+  // Helper function to detect if options represent a rating scale
+  function isRatingScale(options: string[]): boolean {
+    // Check if options look like a rating scale (numbers, very short text, or emojis)
+    return options.every(opt => {
+      const trimmed = opt.trim().toLowerCase();
+      return /^\d+$/.test(trimmed) || // Just numbers
+             trimmed.length <= 15 || // Short labels
+             /ruim|péssimo|regular|bom|ótimo|excelente|muito/i.test(trimmed); // Common rating words
+    });
+  }
+
   function setAnswer(qid: string, value: string) { setAnswers(prev => ({ ...prev, [qid]: value })); }
   
   function submit(){
@@ -531,13 +542,47 @@ function Responder({ questions, onSubmit, currentUser, isManager }: { questions:
                 <button type="button" className="btn-ghost" onClick={() => { setIsResponding(false); setSelectedId(null); setAnswers({}); }}>Voltar à seleção</button>
               </div>
               {sel.questions.map(q => (
-                <div className="q-card responder" key={q.id} style={{ marginBottom:12 }}>
+                <div className="q-card responder" key={q.id}>
                   <div className="q-title">{q.text}{q.required ? <span className="req">*</span> : null}</div>
                   <div className="q-body">
                     {q.type === 'text' ? (
-                      <input className="futuristic-input" value={answers[q.id]||''} onChange={e=>setAnswer(q.id,e.target.value)} placeholder="Sua resposta" />
+                      <textarea 
+                        className="responder-text-input" 
+                        value={answers[q.id]||''} 
+                        onChange={e=>setAnswer(q.id,e.target.value)} 
+                        placeholder="Digite sua resposta aqui..."
+                        rows={3}
+                      />
+                    ) : q.type === 'mcq' && (q.options||[]).length <= 5 && isRatingScale(q.options||[]) ? (
+                      <div className="rating-scale">
+                        {(q.options||[]).map((opt,idx)=>(
+                          <div 
+                            key={idx} 
+                            className={`rating-option ${answers[q.id]===opt ? 'selected' : ''}`}
+                            onClick={()=>setAnswer(q.id,opt)}
+                          >
+                            <div className="rating-circle">
+                              {idx === 0 ? '😞' : idx === 1 ? '😐' : idx === 2 ? '🙂' : idx === 3 ? '😊' : '😍'}
+                            </div>
+                            <div className="rating-label">{opt}</div>
+                          </div>
+                        ))}
+                      </div>
                     ) : (
-                      <div className="mcq">{(q.options||[]).map((opt,idx)=>(<label key={idx} className="mcq-item"><input type="radio" name={q.id} checked={answers[q.id]===opt} onChange={()=>setAnswer(q.id,opt)} /> <span>{opt}</span></label>))}</div>
+                      <div className="mcq">
+                        {(q.options||[]).map((opt,idx)=>(
+                          <div key={idx} className="mcq-item">
+                            <input 
+                              type="radio" 
+                              name={q.id} 
+                              id={`${q.id}-${idx}`}
+                              checked={answers[q.id]===opt} 
+                              onChange={()=>setAnswer(q.id,opt)} 
+                            />
+                            <label htmlFor={`${q.id}-${idx}`}>{opt}</label>
+                          </div>
+                        ))}
+                      </div>
                     )}
                   </div>
                 </div>

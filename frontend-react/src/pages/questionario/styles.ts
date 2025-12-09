@@ -54,13 +54,184 @@ const css = `
 .q-opts{ margin-top:12px; color:var(--sr-text) }
 .opt{ padding:9px 0; font-size:15px }
 
-.q-card.responder{ padding:24px; background:var(--sr-surface) }
-.q-card.responder .q-title{ font-size:17px; color:var(--sr-text); font-weight:600 }
+.q-card.responder{ 
+  padding:24px; 
+  padding-left:28px;
+  background:var(--sr-surface); 
+  border:1px solid var(--sr-border); 
+  border-left:4px solid var(--sr-blue);
+  margin-bottom:20px; 
+  border-radius:8px; 
+  transition:all 0.3s ease;
+  position:relative;
+}
+.q-card.responder:hover{ box-shadow:0 4px 12px rgba(0,75,141,0.08); border-left-color:var(--sr-teal) }
+.q-card.responder .q-title{ 
+  font-size:15px; 
+  color:#1f2937; 
+  font-weight:600; 
+  margin-bottom:16px; 
+  line-height:1.6;
+}
+[data-theme="dark"] .q-card.responder .q-title{ 
+  color:#f3f4f6;
+}
 .q-card.responder .q-body{ margin-top:14px }
-.mcq-item{ display:flex; align-items:center; gap:10px; padding:10px; border-radius:6px; transition:background 0.2s ease }
-.mcq-item:hover{ background:#ffffff }
-.mcq-item input{ margin-right:8px; width:18px; height:18px; cursor:pointer }
-.mcq-item label{ cursor:pointer; font-size:15px }
+
+/* Text input questions */
+.responder-text-input{ 
+  width:100%; 
+  min-height:80px; 
+  padding:14px 16px; 
+  border:1px solid #d1d5db; 
+  border-radius:4px; 
+  background:#f3f4f6; 
+  color:#1f2937; 
+  font-size:14px; 
+  font-weight:500;
+  font-family:inherit; 
+  resize:vertical; 
+  transition:all 0.2s ease;
+}
+[data-theme="dark"] .responder-text-input{ 
+  background:#374151; 
+  border-color:#4b5563;
+  color:#f3f4f6;
+}
+.responder-text-input:focus{ 
+  outline:none; 
+  border-color:var(--sr-blue); 
+  background:white; 
+  box-shadow:0 2px 8px rgba(0,75,141,0.1);
+}
+[data-theme="dark"] .responder-text-input:focus{ 
+  background:#1f2937;
+}
+.responder-text-input::placeholder{ 
+  color:#9ca3af; 
+  font-size:13px;
+}
+
+/* Multiple choice with rounded radio buttons */
+.mcq{ display:flex; flex-direction:column; gap:12px }
+.mcq-item{ 
+  display:flex; 
+  align-items:center; 
+  gap:12px; 
+  padding:12px 14px; 
+  border:1px solid #e5e7eb; 
+  border-radius:6px; 
+  transition:all 0.2s ease; 
+  cursor:pointer;
+  background:var(--sr-surface);
+}
+.mcq-item:hover{ 
+  background:#f9fafb; 
+  border-color:#d1d5db;
+  transform:translateX(4px);
+}
+.mcq-item input[type="radio"]{ 
+  appearance:none; 
+  width:20px; 
+  height:20px; 
+  border:2px solid #d1d5db; 
+  border-radius:50%; 
+  cursor:pointer; 
+  position:relative; 
+  flex-shrink:0; 
+  transition:all 0.2s ease;
+}
+.mcq-item input[type="radio"]:checked{ 
+  border-color:var(--sr-blue); 
+  background:var(--sr-blue);
+}
+.mcq-item input[type="radio"]:checked::after{ 
+  content:''; 
+.mcq-item label{ 
+  cursor:pointer; 
+  font-size:14px; 
+  color:#374151; 
+  font-weight:500;
+  flex:1;
+  user-select:none;
+}
+[data-theme="dark"] .mcq-item label{ 
+  color:#e5e7eb;
+}
+.mcq-item input[type="radio"]:checked ~ label{ 
+  font-weight:700; 
+  color:var(--sr-blue);
+} color:#374151; 
+  font-weight:500;
+  flex:1;
+  user-select:none;
+}
+.mcq-item input[type="radio"]:checked ~ label{ 
+  font-weight:700; 
+  color:var(--sr-blue);
+} color:var(--sr-blue);
+}
+
+/* Rating scale with circles */
+.rating-scale{ 
+  display:flex; 
+  justify-content:space-between; 
+  align-items:center; 
+  gap:16px; 
+  margin-top:20px; 
+  padding:20px;
+  background:#f9fafb;
+  border-radius:8px;
+}
+.rating-option{ 
+  display:flex; 
+  flex-direction:column; 
+  align-items:center; 
+  gap:8px; 
+  cursor:pointer; 
+  transition:all 0.2s ease;
+}
+.rating-circle{ 
+  width:52px; 
+  height:52px; 
+  border:2px solid #d1d5db; 
+  border-radius:50%; 
+  display:flex; 
+  align-items:center; 
+  justify-content:center; 
+  background:white; 
+  transition:all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+  font-size:18px; 
+  color:#6b7280;
+  cursor:pointer;
+}
+.rating-label{ 
+  font-size:12px; 
+  color:#374151; 
+  font-weight:600; 
+  text-align:center; 
+  max-width:80px;
+}
+[data-theme="dark"] .rating-label{ 
+  color:#d1d5db;
+}
+.rating-option.selected .rating-label{ 
+  color:var(--sr-blue); 
+  font-weight:700;
+} box-shadow:0 6px 16px rgba(0,75,141,0.3);
+.rating-label{ 
+  font-size:12px; 
+  color:#374151; 
+  font-weight:600; 
+  text-align:center; 
+  max-width:80px;
+}
+.rating-option.selected .rating-label{ 
+  color:var(--sr-blue); 
+  font-weight:700;
+} font-weight:700;
+}
+
 .req{ color:#ef4444; margin-left:6px }
 
 /* editor two-column preview layout */

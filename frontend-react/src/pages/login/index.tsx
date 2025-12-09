@@ -119,8 +119,13 @@ export default function Logon({ onLogin }: { onLogin: (user: User) => void }) {
 
       {/* Help Bubble */}
       <div className="help-bubble">
-        <h4>Tem algum problema para entrar na sua conta?</h4>
-        <p>Acesse a nossa página <a href="#" className="sac-link">SAC</a></p>
+        <div className="help-speech-bubble">
+          <h4>Tem algum problema para entrar na sua conta?</h4>
+          <p>Acesse a nossa página <a href="#" className="sac-link">SAC</a></p>
+        </div>
+        <div className="help-illustration">
+          <img src="/assets/helper-girl.png" alt="Assistente" />
+        </div>
       </div>
     </div>
   );
