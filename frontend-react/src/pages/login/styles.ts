@@ -4,20 +4,32 @@ const css = `
   --sr-accent: #ffd200;
   --sr-bg: #f6f9fc;
   --sr-surface: #ffffff;
+  --sr-text: #1f2937;
+  --sr-border: #e6eef8;
 }
+
+[data-theme="dark"]{
+  --sr-blue: #3b82f6;
+  --sr-accent: #fbbf24;
+  --sr-bg: #1a1a1a;
+  --sr-surface: #2a2a2a;
+  --sr-text: #e5e5e5;
+  --sr-border: #404040;
+}
+
 /* full-screen split background */
 .logon-split{ min-height: calc(100vh - var(--header-height, 0px) - var(--footer-height, 0px)); position:relative }
 .logon-top{ height:50vh; background: linear-gradient(180deg,var(--sr-blue),#1170b8); display:block }
-.logon-bottom{ height:50vh; background: white }
+.logon-bottom{ height:50vh; background: var(--sr-bg) }
 
 /* rectangle (card) positioned centered on the split (straddles blue and white) */
 .logon-wrapper{ position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:100%; display:flex; justify-content:center; z-index:5 }
-.logon-card{ width:100%; max-width:640px; background:var(--sr-surface); padding:22px; border-radius:4px; box-shadow:0 8px 24px rgba(3,10,30,0.1) }
+.logon-card{ width:100%; max-width:640px; background:var(--sr-surface); padding:22px; border-radius:4px; box-shadow:0 8px 24px rgba(3,10,30,0.2); border: 1px solid var(--sr-border) }
 .logon-card h2{ color:var(--sr-blue); margin:0 0 8px 0; text-align:center }
 .logon-card .field{ margin-top:10px }
-.logon-card .field label{ display:block; margin-bottom:6px; font-size:13px }
-.logon-card .field input{ width:100%; padding:10px; border-radius:4px; border:1px solid #e6eef8 }
-.logon-card .field select{ width:100%; padding:10px; border-radius:4px; border:1px solid #e6eef8 }
+.logon-card .field label{ display:block; margin-bottom:6px; font-size:13px; color:var(--sr-text) }
+.logon-card .field input{ width:100%; padding:10px; border-radius:4px; border:1px solid var(--sr-border); background:var(--sr-surface); color:var(--sr-text) }
+.logon-card .field select{ width:100%; padding:10px; border-radius:4px; border:1px solid var(--sr-border); background:var(--sr-surface); color:var(--sr-text) }
 .logon-card .actions{ margin-top:14px; display:flex; justify-content:center }
 .primary{ background:var(--sr-blue); color:white; border:none; padding:10px 16px; border-radius:4px; cursor:pointer; transition: all 0.2s ease }
 

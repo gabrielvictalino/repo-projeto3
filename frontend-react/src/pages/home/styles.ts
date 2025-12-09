@@ -1,4 +1,26 @@
 const css = `
+:root{
+  --sr-blue: #004b8d;
+  --sr-accent: #ffd200;
+  --sr-teal: #00a99d;
+  --sr-bg: #f6f9fc;
+  --sr-surface: #ffffff;
+  --sr-text: #1f2937;
+  --sr-text-secondary: #6b7280;
+  --sr-border: #e6eef8;
+}
+
+[data-theme="dark"]{
+  --sr-blue: #3b82f6;
+  --sr-accent: #fbbf24;
+  --sr-teal: #14b8a6;
+  --sr-bg: #1a1a1a;
+  --sr-surface: #2a2a2a;
+  --sr-text: #e5e5e5;
+  --sr-text-secondary: #a3a3a3;
+  --sr-border: #404040;
+}
+
 .home-page {
   max-width: 1400px;
   margin: 0 auto;
@@ -49,12 +71,12 @@ const css = `
 }
 
 .ad-card {
-  background: white;
-  border: 1px solid rgba(0, 75, 141, 0.06);
+  background: var(--sr-surface);
+  border: 1px solid var(--sr-border);
   border-radius: 4px;
   overflow: hidden;
   transition: transform 0.22s cubic-bezier(0.2, 0.9, 0.3, 1), box-shadow 0.22s ease;
-  box-shadow: 0 2px 8px rgba(16, 24, 40, 0.04);
+  box-shadow: 0 2px 8px rgba(16, 24, 40, 0.1);
   cursor: pointer;
   text-decoration: none;
   color: inherit;
@@ -98,7 +120,7 @@ const css = `
 
 .ad-card p {
   font-size: 14px;
-  color: #6b7280;
+  color: var(--sr-text-secondary);
   line-height: 1.6;
   margin: 0 0 auto 0;
   flex: 1;

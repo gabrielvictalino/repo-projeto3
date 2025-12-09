@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import './App.css';
 import Menu, { MenuState } from './pages/menu/index';
@@ -25,6 +25,24 @@ function App() {
     try { const raw = localStorage.getItem('sr_user'); return raw ? JSON.parse(raw) as User : null; } catch(e){ return null; }
   });
   const [menuState, setMenuState] = useState<MenuState>('expanded');
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    try { 
+      const saved = localStorage.getItem('sr_theme'); 
+      return (saved === 'dark' ? 'dark' : 'light') as 'light' | 'dark';
+    } catch(e){ return 'light'; }
+  });
+
+  // Apply theme to document
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    try {
+      localStorage.setItem('sr_theme', theme);
+    } catch(e) {}
+  }, [theme]);
+
+  function toggleTheme() {
+    setTheme(current => current === 'light' ? 'dark' : 'light');
+  }
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -105,6 +123,16 @@ function App() {
         </main>
       </div>
       {!isLogin && <Footer />}
+      
+      {/* Floating theme toggle button */}
+      <button 
+        className="theme-toggle-btn"
+        onClick={toggleTheme}
+        title={theme === 'light' ? 'Mudar para modo escuro' : 'Mudar para modo claro'}
+        aria-label="Alternar tema"
+      >
+        {theme === 'light' ? '🌙' : '☀️'}
+      </button>
     </div>
   );
 }
