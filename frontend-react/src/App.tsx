@@ -14,6 +14,15 @@ import { MoonIcon, SunIcon } from './components/Icons';
 
 type View = 'criar' | 'responder' | 'resultados' | 'respondentes';
 
+// Animated wrapper component
+function AnimatedRoute({ children }: { children: React.ReactNode }) {
+  return (
+    <div key={Math.random()} style={{ animation: 'pageSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1)' }}>
+      {children}
+    </div>
+  );
+}
+
 function App() {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [responses, setResponses] = useState<any[]>(() => {
@@ -82,34 +91,34 @@ function App() {
       )}
       <main className="sr-main" style={{ flex: 1 }}>
           <Routes>
-            <Route path="/login" element={<Logon onLogin={(u) => { setUser(u); try{ localStorage.setItem('sr_user', JSON.stringify(u)); }catch(e){} navigate(u.role === 'manager' ? '/gerenciar' : '/home'); }} />} />
+            <Route path="/login" element={<AnimatedRoute><Logon onLogin={(u) => { setUser(u); try{ localStorage.setItem('sr_user', JSON.stringify(u)); }catch(e){} navigate(u.role === 'manager' ? '/gerenciar' : '/home'); }} /></AnimatedRoute>} />
             
             {/* Shared routes for authenticated users */}
-            {user && <Route path="/perfil" element={<Perfil user={user} onLogout={handleLogout} />} />}
+            {user && <Route path="/perfil" element={<AnimatedRoute><Perfil user={user} onLogout={handleLogout} /></AnimatedRoute>} />}
             
             {/* Manager routes */}
             {isManager && (
               <>
-                <Route path="/gerenciar" element={<ManagerPanel />} />
-                <Route path="/criar" element={<QuestionarioPage view={'criar'} setView={(v)=>navigate(v)} questions={questions} setQuestions={setQuestions} responses={responses} addResponse={handleSubmitResponse} currentUser={user} />} />
-                <Route path="/resultados" element={<QuestionarioPage view={'resultados'} setView={(v)=>navigate(v)} questions={questions} setQuestions={setQuestions} responses={responses} addResponse={handleSubmitResponse} currentUser={user} />} />
-                <Route path="/respondentes" element={<QuestionarioPage view={'respondentes'} setView={(v)=>navigate(v)} questions={questions} setQuestions={setQuestions} responses={responses} addResponse={handleSubmitResponse} currentUser={user} />} />
+                <Route path="/gerenciar" element={<AnimatedRoute><ManagerPanel /></AnimatedRoute>} />
+                <Route path="/criar" element={<AnimatedRoute><QuestionarioPage view={'criar'} setView={(v)=>navigate(v)} questions={questions} setQuestions={setQuestions} responses={responses} addResponse={handleSubmitResponse} currentUser={user} /></AnimatedRoute>} />
+                <Route path="/resultados" element={<AnimatedRoute><QuestionarioPage view={'resultados'} setView={(v)=>navigate(v)} questions={questions} setQuestions={setQuestions} responses={responses} addResponse={handleSubmitResponse} currentUser={user} /></AnimatedRoute>} />
+                <Route path="/respondentes" element={<AnimatedRoute><QuestionarioPage view={'respondentes'} setView={(v)=>navigate(v)} questions={questions} setQuestions={setQuestions} responses={responses} addResponse={handleSubmitResponse} currentUser={user} /></AnimatedRoute>} />
               </>
             )}
             
             {/* Cliente routes */}
             {isCliente && (
               <>
-                <Route path="/home" element={<HomePage />} />
-                <Route path="/responder" element={<QuestionarioPage view={'responder'} setView={(v)=>navigate(v)} questions={questions} setQuestions={setQuestions} responses={responses} addResponse={handleSubmitResponse} currentUser={user} />} />
-                <Route path="/meus-resultados" element={<QuestionarioPage view={'resultados'} setView={(v)=>navigate(v)} questions={questions} setQuestions={setQuestions} responses={responses} addResponse={handleSubmitResponse} currentUser={user} />} />
+                <Route path="/home" element={<AnimatedRoute><HomePage /></AnimatedRoute>} />
+                <Route path="/responder" element={<AnimatedRoute><QuestionarioPage view={'responder'} setView={(v)=>navigate(v)} questions={questions} setQuestions={setQuestions} responses={responses} addResponse={handleSubmitResponse} currentUser={user} /></AnimatedRoute>} />
+                <Route path="/meus-resultados" element={<AnimatedRoute><QuestionarioPage view={'resultados'} setView={(v)=>navigate(v)} questions={questions} setQuestions={setQuestions} responses={responses} addResponse={handleSubmitResponse} currentUser={user} /></AnimatedRoute>} />
               </>
             )}
             
             {/* Guest/default routes - can access home and responder without login */}
-            <Route path="/" element={user ? (isManager ? <ManagerPanel /> : <HomePage />) : <HomePage />} />
-            <Route path="/home" element={<HomePage />} />
-            <Route path="/responder" element={<QuestionarioPage view={'responder'} setView={(v)=>navigate(v)} questions={questions} setQuestions={setQuestions} responses={responses} addResponse={handleSubmitResponse} currentUser={user} />} />
+            <Route path="/" element={<AnimatedRoute>{user ? (isManager ? <ManagerPanel /> : <HomePage />) : <HomePage />}</AnimatedRoute>} />
+            <Route path="/home" element={<AnimatedRoute><HomePage /></AnimatedRoute>} />
+            <Route path="/responder" element={<AnimatedRoute><QuestionarioPage view={'responder'} setView={(v)=>navigate(v)} questions={questions} setQuestions={setQuestions} responses={responses} addResponse={handleSubmitResponse} currentUser={user} /></AnimatedRoute>} />
           </Routes>
         </main>
       {!isLogin && <Footer />}

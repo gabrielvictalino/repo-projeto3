@@ -81,23 +81,63 @@ const css = `
   cursor: pointer;
   font-size: 13px;
   font-weight: 500;
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   align-items: center;
   gap: 8px;
   white-space: nowrap;
   height: 32px;
+  position: relative;
 }
 
 .header-nav .nav-item:hover{
   background: rgba(255,255,255,0.12);
   color: white;
+  transform: translateY(-1px);
 }
 
 .header-nav .nav-item.active{
   background: rgba(255,210,0,0.2);
   color: white;
   font-weight: 600;
+  animation: navItemActive 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.header-nav .nav-item.active:after{
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  height: 2px;
+  background: var(--sr-accent);
+  border-radius: 2px;
+  animation: underlineExpand 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes navItemActive {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes underlineExpand {
+  from {
+    width: 0%;
+    opacity: 0;
+  }
+  to {
+    width: 60%;
+    opacity: 1;
+  }
+}
 }
 
 .header-nav .nav-icon{
@@ -132,7 +172,7 @@ const css = `
   display: flex;
   align-items: center;
   gap: 8px;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .search-toggle{
@@ -147,13 +187,17 @@ const css = `
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   flex-shrink: 0;
 }
 
 .search-toggle:hover{
   background: rgba(255,255,255,0.15);
-  transform: scale(1.05);
+  transform: scale(1.1) rotate(90deg);
+}
+
+.search-toggle:active{
+  transform: scale(0.95) rotate(90deg);
 }
 
 .search-input{
@@ -163,10 +207,38 @@ const css = `
   background: rgba(255,255,255,0.1);
   color: white;
   font-size: 13px;
-  width: 250px;
+  width: 0;
   height: 32px;
   outline: none;
-  transition: all 0.2s ease;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 0;
+  transform: translateX(20px);
+  pointer-events: none;
+}
+
+.search-input.visible{
+  width: 250px;
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+  animation: searchExpand 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes searchExpand {
+  0% {
+    width: 0;
+    opacity: 0;
+    transform: translateX(20px) scale(0.8);
+  }
+  60% {
+    width: 270px;
+    transform: translateX(-5px) scale(1.02);
+  }
+  100% {
+    width: 250px;
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
 }
 
 .search-input::placeholder{
@@ -176,6 +248,8 @@ const css = `
 .search-input:focus{
   background: rgba(255,255,255,0.15);
   border-color: rgba(255,255,255,0.4);
+  width: 280px;
+  box-shadow: 0 0 0 3px rgba(255,255,255,0.1);
 }
 
 /* Actions Section - Clean reset */

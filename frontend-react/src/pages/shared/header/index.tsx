@@ -100,7 +100,7 @@ export default function Header({ subtitle, onLogin, user, onLogout }: HeaderProp
                 placeholder="Buscar questionários..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="search-input"
+                className="search-input visible"
                 autoFocus
               />
             )}
