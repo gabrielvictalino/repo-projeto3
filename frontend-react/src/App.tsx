@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import './App.css';
-import Menu, { MenuState } from './pages/menu/index';
 import QuestionarioPage from './pages/questionario/index';
 import Logon from './pages/login/index';
 import HomePage from './pages/home/index';
@@ -24,7 +23,6 @@ function App() {
   const [user, setUser] = useState<User | null>(() => {
     try { const raw = localStorage.getItem('sr_user'); return raw ? JSON.parse(raw) as User : null; } catch(e){ return null; }
   });
-  const [menuState, setMenuState] = useState<MenuState>('expanded');
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
     try { 
       const saved = localStorage.getItem('sr_theme'); 
@@ -70,14 +68,6 @@ function App() {
 
   function handleLogout(){ setUser(null); try{ localStorage.removeItem('sr_user'); }catch(e){} navigate('/'); }
 
-  function cycleMenuState() {
-    setMenuState(current => {
-      if (current === 'expanded') return 'collapsed';
-      if (current === 'collapsed') return 'hidden';
-      return 'expanded';
-    });
-  }
-
   return (
     <div className="sr-app">
       {!isLogin && (
@@ -86,13 +76,9 @@ function App() {
           onLogin={() => navigate('/login')} 
           user={user} 
           onLogout={handleLogout}
-          onToggleMenu={cycleMenuState}
-          showMenuToggle={true}
         />
       )}
-      <div style={{ display: 'flex', alignItems: 'stretch', flex: 1 }}>
-        {!isLogin && <Menu current={location.pathname} onChange={(p)=>navigate(p)} userRole={user?.role} menuState={menuState} />}
-        <main className="sr-main" style={{ flex: 1 }}>
+      <main className="sr-main" style={{ flex: 1 }}>
           <Routes>
             <Route path="/login" element={<Logon onLogin={(u) => { setUser(u); try{ localStorage.setItem('sr_user', JSON.stringify(u)); }catch(e){} navigate(u.role === 'manager' ? '/gerenciar' : '/home'); }} />} />
             
@@ -121,7 +107,6 @@ function App() {
             <Route path="/responder" element={<QuestionarioPage view={'responder'} setView={(v)=>navigate(v)} questions={questions} setQuestions={setQuestions} responses={responses} addResponse={handleSubmitResponse} currentUser={user} />} />
           </Routes>
         </main>
-      </div>
       {!isLogin && <Footer />}
       
       {/* Floating theme toggle button */}

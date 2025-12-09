@@ -1,48 +1,97 @@
 const css = `
 :root{ --header-height:72px }
-.sr-header{ display:flex; align-items:center; justify-content:space-between; gap:16px; padding:12px 28px; background:linear-gradient(90deg,var(--sr-blue),#1170b8); color:white; box-shadow: 0 2px 8px rgba(16,24,40,0.06); border-bottom-left-radius:2px; border-bottom-right-radius:2px; height:var(--header-height) }
+.sr-header{ 
+  display:flex; 
+  align-items:center; 
+  justify-content:space-between; 
+  gap:20px; 
+  padding:12px 32px; 
+  background:linear-gradient(90deg,var(--sr-blue),#1170b8); 
+  color:white; 
+  box-shadow: 0 2px 8px rgba(16,24,40,0.06); 
+  border-bottom-left-radius:2px; 
+  border-bottom-right-radius:2px; 
+  height:var(--header-height);
+  position: relative;
+}
 
-/* Hamburger button in header */
-.sr-hamburger-header{
-  background: rgba(255,255,255,0.1);
+.sr-header .brand{ 
+  display:flex; 
+  align-items:center; 
+  gap:14px;
+  flex-shrink: 0;
+}
+.sr-header .brand .logo{ 
+  width:44px; 
+  height:44px; 
+  border-radius:2px; 
+  background:var(--sr-accent); 
+  display:inline-block; 
+  box-shadow:0 2px 8px rgba(0,0,0,0.08);
+}
+.sr-header .title{ 
+  font-size:18px; 
+  font-weight:700;
+  white-space: nowrap;
+}
+.sr-header .subtitle{ 
+  font-size:13px; 
+  opacity:0.9;
+  white-space: nowrap;
+}
+
+/* Navigation in header */
+.header-nav{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  justify-content: center;
+  max-width: 800px;
+}
+
+.header-nav .nav-item{
+  background: rgba(255,255,255,0.08);
   border: none;
+  color: white;
+  padding: 10px 20px;
   border-radius: 2px;
   cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 4px;
-  padding: 8px 10px;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  margin-right: 12px;
-}
-.sr-hamburger-header .line{
-  width: 20px;
-  height: 2px;
-  background: white;
-  border-radius: 1px;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-.sr-hamburger-header:hover{
-  background: rgba(255,255,255,0.15);
-}
-.sr-hamburger-header:active{
-  transform: scale(0.95);
+  gap: 8px;
+  white-space: nowrap;
 }
 
-.sr-header .brand{ display:flex; align-items:center; gap:14px }
-.sr-header .brand .logo{ width:44px; height:44px; border-radius:2px; background:var(--sr-accent); display:inline-block; box-shadow:0 2px 8px rgba(0,0,0,0.08) }
-.sr-header .title{ font-size:18px; font-weight:700 }
-.sr-header .subtitle{ font-size:13px; opacity:0.9 }
+.header-nav .nav-item:hover{
+  background: rgba(255,255,255,0.15);
+  transform: translateY(-1px);
+}
+
+.header-nav .nav-item.active{
+  background: var(--sr-accent);
+  color: var(--sr-blue);
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(255,210,0,0.3);
+}
+
+.header-nav .nav-icon{
+  font-size: 16px;
+}
+
+.header-nav .nav-label{
+  font-size: 14px;
+}
 
 /* Center section with search */
 .sr-header .header-center{
-  flex: 1;
   display: flex;
-  justify-content: center;
-  max-width: 500px;
-  margin: 0 auto;
+  justify-content: flex-end;
+  align-items: center;
+  flex-shrink: 0;
 }
 
 .search-container{
