@@ -3,6 +3,8 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import injectHeaderStyles from './styles-new';
 import type { User } from '../../../types/user';
 import { useSearch } from '../../../contexts/SearchContext';
+import { useFeedback } from '../../../contexts/FeedbackContext';
+import NotificationsPanel from '../../../components/NotificationsPanel';
 import { 
   HomeIcon, 
   PlusIcon, 
@@ -26,7 +28,9 @@ interface HeaderProps {
 
 export default function Header({ subtitle, onLogin, user, onLogout }: HeaderProps){
   const { searchQuery, setSearchQuery } = useSearch();
+  const { getUnreadCount } = useFeedback();
   const [showSearch, setShowSearch] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -41,12 +45,14 @@ export default function Header({ subtitle, onLogin, user, onLogout }: HeaderProp
         { path: '/criar', label: 'Criar', icon: <PlusIcon /> },
         { path: '/resultados', label: 'Resultados', icon: <ChartIcon /> },
         { path: '/respondentes', label: 'Respondentes', icon: <UsersIcon /> },
+        { path: '/feedbacks', label: 'Feedbacks', icon: <DocumentIcon /> },
       ];
     } else if (isCliente) {
       return [
         { path: '/home', label: 'Início', icon: <HomeIcon /> },
         { path: '/responder', label: 'Questionários', icon: <DocumentIcon /> },
         { path: '/meus-resultados', label: 'Respostas', icon: <ChartIcon /> },
+        { path: '/feedbacks', label: 'Feedbacks', icon: <BellIcon /> },
       ];
     } else {
       return [
@@ -113,9 +119,15 @@ export default function Header({ subtitle, onLogin, user, onLogout }: HeaderProp
       <div className="actions">
         {user && (
           <>
-            <button className="header-btn bell-btn" title="Notificações">
+            <button 
+              className="header-btn bell-btn" 
+              title="Notificações"
+              onClick={() => setShowNotifications(!showNotifications)}
+            >
               <BellIcon size={18} />
-              {/* <span className="badge">3</span> */}
+              {getUnreadCount(user.name) > 0 && (
+                <span className="badge">{getUnreadCount(user.name)}</span>
+              )}
             </button>
             <button className="header-btn profile-info" onClick={() => navigate('/perfil')} title="Ver perfil">
               <img 
@@ -136,6 +148,14 @@ export default function Header({ subtitle, onLogin, user, onLogout }: HeaderProp
           </button>
         )}
       </div>
+      
+      {/* Notifications Panel */}
+      {showNotifications && user && (
+        <NotificationsPanel
+          userId={user.name}
+          onClose={() => setShowNotifications(false)}
+        />
+      )}
     </header>
   );
 }

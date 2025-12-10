@@ -2,18 +2,19 @@ import React, { useState, useEffect } from 'react';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import './App.css';
 import QuestionarioPage from './pages/questionario/index';
+import type { View } from './pages/questionario/index';
 import Logon from './pages/login/index';
 import HomePage from './pages/home/index';
 import ManagerPanel from './pages/manager/index';
 import Perfil from './pages/perfil';
+import Feedbacks from './pages/feedbacks';
 import Header from './pages/shared/header/index';
 import Footer from './pages/shared/footer/index';
 import type { Question } from './pages/questionario/index';
 import type { User } from './types/user';
 import { MoonIcon, SunIcon } from './components/Icons';
 import { SearchProvider } from './contexts/SearchContext';
-
-type View = 'criar' | 'responder' | 'resultados' | 'respondentes';
+import { FeedbackProvider } from './contexts/FeedbackContext';
 
 // Animated wrapper component
 function AnimatedRoute({ children }: { children: React.ReactNode }) {
@@ -31,6 +32,12 @@ function App() {
       const raw = localStorage.getItem('sr_responses'); 
       return raw ? JSON.parse(raw) : [];
     } catch(e){ return []; }
+  });
+  const [questionnaires, setQuestionnaires] = useState<any[]>(() => {
+    try {
+      const raw = localStorage.getItem('sr_questionarios');
+      return raw ? JSON.parse(raw) : [];
+    } catch(e) { return []; }
   });
   const [user, setUser] = useState<User | null>(() => {
     try { const raw = localStorage.getItem('sr_user'); return raw ? JSON.parse(raw) as User : null; } catch(e){ return null; }
@@ -81,12 +88,13 @@ function App() {
   function handleLogout(){ setUser(null); try{ localStorage.removeItem('sr_user'); }catch(e){} navigate('/'); }
 
   return (
-    <SearchProvider>
-      <div className="sr-app">
-        {!isLogin && (
-          <Header 
-            subtitle="Crie e responda questionários com facilidade" 
-            onLogin={() => navigate('/login')} 
+    <FeedbackProvider>
+      <SearchProvider>
+        <div className="sr-app">
+          {!isLogin && (
+            <Header 
+              subtitle="Crie e responda questionários com facilidade" 
+              onLogin={() => navigate('/login')} 
             user={user} 
             onLogout={handleLogout}
           />
@@ -97,14 +105,15 @@ function App() {
             
             {/* Shared routes for authenticated users */}
             {user && <Route path="/perfil" element={<AnimatedRoute><Perfil user={user} onLogout={handleLogout} /></AnimatedRoute>} />}
+            {user && <Route path="/feedbacks" element={<AnimatedRoute><Feedbacks currentUser={user} responses={responses} /></AnimatedRoute>} />}
             
             {/* Manager routes */}
             {isManager && (
               <>
                 <Route path="/gerenciar" element={<AnimatedRoute><ManagerPanel /></AnimatedRoute>} />
-                <Route path="/criar" element={<AnimatedRoute><QuestionarioPage view={'criar'} setView={(v:View)=>navigate(v)} questions={questions} setQuestions={setQuestions} responses={responses} addResponse={handleSubmitResponse} currentUser={user} /></AnimatedRoute>} />
-                <Route path="/resultados" element={<AnimatedRoute><QuestionarioPage view={'resultados'} setView={(v:View)=>navigate(v)} questions={questions} setQuestions={setQuestions} responses={responses} addResponse={handleSubmitResponse} currentUser={user} /></AnimatedRoute>} />
-                <Route path="/respondentes" element={<AnimatedRoute><QuestionarioPage view={'respondentes'} setView={(v:View)=>navigate(v)} questions={questions} setQuestions={setQuestions} responses={responses} addResponse={handleSubmitResponse} currentUser={user} /></AnimatedRoute>} />
+                <Route path="/criar" element={<AnimatedRoute><QuestionarioPage view={'criar'} setView={(v:View)=>navigate(v)} questions={questions} setQuestions={setQuestions} responses={responses} addResponse={handleSubmitResponse} currentUser={user} questionnaires={questionnaires} /></AnimatedRoute>} />
+                <Route path="/resultados" element={<AnimatedRoute><QuestionarioPage view={'resultados'} setView={(v:View)=>navigate(v)} questions={questions} setQuestions={setQuestions} responses={responses} addResponse={handleSubmitResponse} currentUser={user} questionnaires={questionnaires} /></AnimatedRoute>} />
+                <Route path="/respondentes" element={<AnimatedRoute><QuestionarioPage view={'respondentes'} setView={(v:View)=>navigate(v)} questions={questions} setQuestions={setQuestions} responses={responses} addResponse={handleSubmitResponse} currentUser={user} questionnaires={questionnaires} /></AnimatedRoute>} />
               </>
             )}
             
@@ -112,15 +121,15 @@ function App() {
             {isCliente && (
               <>
                 <Route path="/home" element={<AnimatedRoute><HomePage /></AnimatedRoute>} />
-                <Route path="/responder" element={<AnimatedRoute><QuestionarioPage view={'responder'} setView={(v:View)=>navigate(v)} questions={questions} setQuestions={setQuestions} responses={responses} addResponse={handleSubmitResponse} currentUser={user} /></AnimatedRoute>} />
-                <Route path="/meus-resultados" element={<AnimatedRoute><QuestionarioPage view={'resultados'} setView={(v:View)=>navigate(v)} questions={questions} setQuestions={setQuestions} responses={responses} addResponse={handleSubmitResponse} currentUser={user} /></AnimatedRoute>} />
+                <Route path="/responder" element={<AnimatedRoute><QuestionarioPage view={'responder'} setView={(v:View)=>navigate(v)} questions={questions} setQuestions={setQuestions} responses={responses} addResponse={handleSubmitResponse} currentUser={user} questionnaires={questionnaires} /></AnimatedRoute>} />
+                <Route path="/meus-resultados" element={<AnimatedRoute><QuestionarioPage view={'resultados'} setView={(v:View)=>navigate(v)} questions={questions} setQuestions={setQuestions} responses={responses} addResponse={handleSubmitResponse} currentUser={user} questionnaires={questionnaires} /></AnimatedRoute>} />
               </>
             )}
             
             {/* Guest/default routes - can access home and responder without login */}
             <Route path="/" element={<AnimatedRoute>{user ? (isManager ? <ManagerPanel /> : <HomePage />) : <HomePage />}</AnimatedRoute>} />
             <Route path="/home" element={<AnimatedRoute><HomePage /></AnimatedRoute>} />
-            <Route path="/responder" element={<AnimatedRoute><QuestionarioPage view={'responder'} setView={(v:View)=>navigate(v)} questions={questions} setQuestions={setQuestions} responses={responses} addResponse={handleSubmitResponse} currentUser={user} /></AnimatedRoute>} />
+            <Route path="/responder" element={<AnimatedRoute><QuestionarioPage view={'responder'} setView={(v:View)=>navigate(v)} questions={questions} setQuestions={setQuestions} responses={responses} addResponse={handleSubmitResponse} currentUser={user} questionnaires={questionnaires} /></AnimatedRoute>} />
           </Routes>
         </main>
       {!isLogin && <Footer />}
@@ -134,8 +143,9 @@ function App() {
       >
         {theme === 'light' ? <MoonIcon size={22} /> : <SunIcon size={22} />}
       </button>
-      </div>
-    </SearchProvider>
+        </div>
+      </SearchProvider>
+    </FeedbackProvider>
   );
 }
 

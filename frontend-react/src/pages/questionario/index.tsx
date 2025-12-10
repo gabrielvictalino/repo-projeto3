@@ -4,8 +4,12 @@ import injectQuestionarioStyles from './styles';
 import { EditIcon, TrashIcon, UserIcon, LightBulbIcon } from '../../components/Icons';
 import { useSearch } from '../../contexts/SearchContext';
 import ErrorNotification from '../../components/ErrorNotification';
+import Feedbacks from '../feedbacks';
+import ResponseModal from '../../components/ResponseModal';
 
 injectQuestionarioStyles();
+
+export type View = 'criar' | 'responder' | 'resultados' | 'respondentes' | 'feedbacks';
 
 export type Question = {
   id: string;
@@ -26,8 +30,6 @@ export const COVER_IMAGES = [
   { id: 'sebrae7', url: 'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=800&h=400&fit=crop', label: 'Apresentação' },
   { id: 'sebrae8', url: 'https://images.unsplash.com/photo-1573164713714-d95e436ab8d6?w=800&h=400&fit=crop', label: 'Empreendedorismo' },
 ];
-
-type View = 'criar' | 'responder' | 'resultados' | 'respondentes';
 
 function Editor({ onSave }: { onSave: (qs: Question[]) => void }) {
   // Check if editing existing questionnaire
@@ -387,7 +389,7 @@ function Editor({ onSave }: { onSave: (qs: Question[]) => void }) {
 
 type Questionnaire = { id: string; title: string; questions: Question[]; coverImage?: string };
 
-function Responder({ questions, onSubmit, currentUser, isManager }: { questions: Question[]; onSubmit: (r:any)=>void; currentUser?: { name: string; role: string } | null; isManager?: boolean }) {
+function Responder({ questions, onSubmit, currentUser, isManager, onViewResults }: { questions: Question[]; onSubmit: (r:any)=>void; currentUser?: { name: string; role: string } | null; isManager?: boolean; onViewResults?: () => void }) {
   const { searchQuery } = useSearch();
   
   // Load saved questionnaires from localStorage (if any)
@@ -409,6 +411,24 @@ function Responder({ questions, onSubmit, currentUser, isManager }: { questions:
   const [answers, setAnswers] = useState<Record<string,string>>({});
   const [isResponding, setIsResponding] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const submitTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
+
+  function handleViewResults() {
+    if (!currentUser) {
+      setErrorMessage('Você precisa estar logado para visualizar resultados.');
+      return;
+    }
+    // Interromper o timeout se existir
+    if (submitTimeoutRef.current) {
+      clearTimeout(submitTimeoutRef.current);
+      submitTimeoutRef.current = null;
+    }
+    setIsSubmitting(false);
+    if (onViewResults) {
+      onViewResults();
+    }
+  }
 
   // Filter questionnaires based on search query
   const filteredQuestionnaires = questionnaires.filter(q => {
@@ -447,24 +467,32 @@ function Responder({ questions, onSubmit, currentUser, isManager }: { questions:
       return;
     }
     
+    // Mostrar tela de loading
+    setIsSubmitting(true);
+    
     // Determine user ID - 'guest' if no user logged in
     const userId = currentUser ? currentUser.name : 'guest';
     const userName = currentUser ? currentUser.name : 'Visitante';
     
-    // clear selection UI so selection grid can reappear later
-    setIsResponding(false);
-    setSelectedId(null);
-    
-    // Submit with user information
-    onSubmit({ 
-      id: String(Date.now()), 
-      questionnaireId: selectedId, 
-      answers,
-      userId,
-      userName,
-      timestamp: new Date().toISOString()
-    });
-    setAnswers({});
+    // Aguardar 5 segundos antes de finalizar
+    submitTimeoutRef.current = setTimeout(() => {
+      // clear selection UI so selection grid can reappear later
+      setIsResponding(false);
+      setSelectedId(null);
+      
+      // Submit with user information
+      onSubmit({ 
+        id: String(Date.now()), 
+        questionnaireId: selectedId, 
+        answers,
+        userId,
+        userName,
+        timestamp: new Date().toISOString()
+      });
+      setAnswers({});
+      setIsSubmitting(false);
+      submitTimeoutRef.current = null;
+    }, 5000);
   }
 
   function selectedQuestionnaire(): Questionnaire | undefined {
@@ -504,6 +532,33 @@ function Responder({ questions, onSubmit, currentUser, isManager }: { questions:
   if (!questionnaires || questionnaires.length === 0) return <div className="sr-empty">Nenhum questionário disponível. Crie um na aba "Criar".</div>;
 
   const sel = selectedQuestionnaire();
+
+  if (isSubmitting) {
+    return (
+      <div className="sr-responder">
+        <div className="submission-success">
+          <div className="success-content">
+            <div className="success-icon">✓</div>
+            <h2>Você finalizou a pesquisa, assim que tiver uma respota iremos te avisar.</h2>
+            <p style={{ marginTop: 12, opacity: 0.8 }}>Obrigado por responder!</p>
+            {currentUser ? (
+              <button 
+                className="view-form-link" 
+                onClick={handleViewResults}
+                style={{ border: 'none', cursor: 'pointer' }}
+              >
+                Visualizar seu formulário
+              </button>
+            ) : (
+              <p style={{ marginTop: 20, fontSize: 14, color: 'var(--sr-text-secondary)' }}>
+                Faça login para visualizar seus formulários
+              </p>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="sr-responder">
@@ -641,6 +696,9 @@ function Responder({ questions, onSubmit, currentUser, isManager }: { questions:
 }
 
 function Results({ questions, responses, currentUser }: { questions: Question[]; responses: any[]; currentUser?: { name: string; role: string } | null }){
+  const [selectedResponse, setSelectedResponse] = useState<any | null>(null);
+  const [selectedQuestionnaire, setSelectedQuestionnaire] = useState<Questionnaire | null>(null);
+  
   // Load all questionnaires to show their titles
   const loadQuestionnaires = (): Questionnaire[] => {
     try {
@@ -669,6 +727,11 @@ function Results({ questions, responses, currentUser }: { questions: Question[];
 
   const questionnaireIds = Object.keys(responsesByQuestionnaire);
 
+  const handleResponseClick = (response: any, questionnaire: Questionnaire) => {
+    setSelectedResponse(response);
+    setSelectedQuestionnaire(questionnaire);
+  };
+
   if (questionnaireIds.length === 0) {
     return <div className="sr-empty">
       {currentUser?.role === 'cliente' 
@@ -681,14 +744,67 @@ function Results({ questions, responses, currentUser }: { questions: Question[];
     <div className="sr-results">
       <h2>{currentUser?.role === 'cliente' ? 'Minhas Respostas' : 'Resultados'}</h2>
       
+      {/* Para managers: lista de respostas individuais */}
+      {currentUser?.role === 'manager' && (
+        <div className="responses-list">
+          <div className="responses-header">
+            <h3>🎯 Respostas dos Usuários</h3>
+            <p>Toque em um balão para ver detalhes</p>
+          </div>
+          <div className="response-cards">
+            {userResponses.map(response => {
+              const questionnaire = questionnaires.find(q => q.id === response.questionnaireId);
+              if (!questionnaire) return null;
+              
+              const answerCount = Object.keys(response.answers).length;
+              const colors = ['#004b8d', '#00a99d', '#ffd200', '#0066cc', '#00b4d8', '#ffb700', '#0077be', '#06d6a0'];
+              const colorIndex = response.userName.charCodeAt(0) % colors.length;
+              
+              return (
+                <div
+                  key={response.id}
+                  className="response-bubble"
+                  style={{ '--bubble-color': colors[colorIndex] } as React.CSSProperties}
+                  onClick={() => handleResponseClick(response, questionnaire)}
+                >
+                  <div className="bubble-avatar">
+                    {response.userName.charAt(0).toUpperCase()}
+                  </div>
+                  <div className="bubble-content">
+                    <div className="bubble-user">{response.userName}</div>
+                    <div className="bubble-title">{questionnaire.title}</div>
+                    <div className="bubble-stats">
+                      <span className="stat-badge">✅ {answerCount}</span>
+                      <span className="stat-date">📅 {new Date(response.timestamp).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })}</span>
+                    </div>
+                  </div>
+                  <div className="bubble-arrow">›</div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+      
+      {/* Agregação por questionário (para ambos) */}
+      <div style={{ marginTop: currentUser?.role === 'manager' ? 40 : 0 }}>
+        {currentUser?.role === 'manager' && <h3>Análise Agregada</h3>}
+      
       {questionnaireIds.map(qId => {
         const questionnaire = questionnaires.find(q => q.id === qId);
         const qResponses = responsesByQuestionnaire[qId];
         
         if (!questionnaire) return null;
 
+        const colors = ['#004b8d', '#00a99d', '#ffd200', '#0066cc', '#00b4d8', '#ffb700', '#0077be', '#06d6a0'];
+        const colorIndex = (questionnaire.title || '').charCodeAt(0) % colors.length;
+
         return (
-          <div key={qId} className="questionnaire-results">
+          <div 
+            key={qId} 
+            className="questionnaire-results questionnaire-bubble"
+            style={{ '--quest-color': colors[colorIndex] } as React.CSSProperties}
+          >
             <div className="questionnaire-header">
               <h3>{questionnaire.title || 'Questionário'}</h3>
               <span className="response-count">{qResponses.length} resposta{qResponses.length !== 1 ? 's' : ''}</span>
@@ -727,38 +843,110 @@ function Results({ questions, responses, currentUser }: { questions: Question[];
           </div>
         );
       })}
+      </div>
+      
+      {/* Response Modal */}
+      {selectedResponse && selectedQuestionnaire && (
+        <ResponseModal
+          response={selectedResponse}
+          questionnaire={selectedQuestionnaire}
+          onClose={() => {
+            setSelectedResponse(null);
+            setSelectedQuestionnaire(null);
+          }}
+          currentUser={currentUser || null}
+        />
+      )}
     </div>
   );
 }
 
-function Respondents({ responses }: { responses: any[] }){
+function Respondents({ responses, questionnaires }: { responses: any[]; questionnaires: Questionnaire[] }){
   if (!responses || responses.length === 0) return <div className="sr-empty">Nenhuma resposta enviada ainda.</div>;
+  
+  // Cores Sebrae
+  const colors = ['#004b8d', '#00a99d', '#ffd200', '#0066cc', '#00b4d8', '#ffb700', '#0077be', '#06d6a0'];
+  
+  // Agrupar respostas por questionário
+  const responsesByQuestionnaire: Record<string, any[]> = {};
+  responses.forEach(r => {
+    const qId = r.questionnaireId || 'unknown';
+    if (!responsesByQuestionnaire[qId]) {
+      responsesByQuestionnaire[qId] = [];
+    }
+    responsesByQuestionnaire[qId].push(r);
+  });
+  
   return (
     <div className="sr-respondents">
-      <h2>Respondentes</h2>
-      <ul>
-        {responses.map(r=>(
-          <li key={r.id}>
-            <strong>{r.userName || 'Anônimo'}</strong> 
-            {r.userId === 'guest' && <span style={{color: 'var(--sr-teal)', fontSize: 12, marginLeft: 8, display: 'inline-flex', alignItems: 'center', gap: 4}}><UserIcon size={12} /> Visitante</span>}
-            {' '}— {Object.keys(r.answers).length} respostas
-            {r.timestamp && <span style={{fontSize: 11, opacity: 0.7, marginLeft: 8}}>({new Date(r.timestamp).toLocaleString()})</span>}
-          </li>
-        ))}
-      </ul>
+      <div className="respondents-header">
+        <h2>👥 Respondentes</h2>
+        <p>Veja quem já participou de cada questionário</p>
+      </div>
+      
+      {Object.entries(responsesByQuestionnaire).map(([qId, qResponses]) => {
+        const questionnaire = questionnaires.find(q => q.id === qId);
+        const questionnaireTitle = questionnaire?.title || 'Questionário sem título';
+        const colorIndex = (questionnaireTitle.charCodeAt(0) || 0) % colors.length;
+        
+        return (
+          <div key={qId} className="questionnaire-group">
+            <div 
+              className="questionnaire-group-header"
+              style={{ '--group-color': colors[colorIndex] } as React.CSSProperties}
+            >
+              <h3>📋 {questionnaireTitle}</h3>
+              <span className="respondents-count">{qResponses.length} respondente{qResponses.length !== 1 ? 's' : ''}</span>
+            </div>
+            
+            <div className="respondents-bubbles">
+              {qResponses.map((r, index) => {
+                const userColorIndex = (r.userName || 'A').charCodeAt(0) % colors.length;
+                const answerCount = Object.keys(r.answers).length;
+                const isGuest = r.userId === 'guest';
+                
+                return (
+                  <div
+                    key={r.id}
+                    className="respondent-bubble"
+                    style={{ '--bubble-color': colors[userColorIndex] } as React.CSSProperties}
+                  >
+                    <div className="respondent-avatar">
+                      {(r.userName || 'Anônimo').charAt(0).toUpperCase()}
+                    </div>
+                    <div className="respondent-content">
+                      <div className="respondent-name">{r.userName || 'Anônimo'}</div>
+                      <div className="respondent-stats">
+                        <span className="respondent-badge">✅ {answerCount}</span>
+                        {isGuest && <span className="guest-badge">👤 Visitante</span>}
+                        {r.timestamp && (
+                          <span className="respondent-time">
+                            🕒 {new Date(r.timestamp).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }
 
-export default function QuestionarioPage({ view, setView, questions, setQuestions, responses, addResponse, currentUser }: { view: View; setView:(v:View)=>void; questions: Question[]; setQuestions:(qs:Question[])=>void; responses:any[]; addResponse:(r:any)=>void; currentUser?: { name: string; role: string } | null }){
+export default function QuestionarioPage({ view, setView, questions, setQuestions, responses, addResponse, currentUser, questionnaires }: { view: View; setView:(v:View)=>void; questions: Question[]; setQuestions:(qs:Question[])=>void; responses:any[]; addResponse:(r:any)=>void; currentUser?: { name: string; role: string } | null; questionnaires: Questionnaire[] }){
   const isManager = currentUser?.role === 'manager';
   
   return (
     <>
       {view === 'criar' && <Editor onSave={(qs)=>{ setQuestions(qs); setView('responder'); }} />}
-      {view === 'responder' && <Responder questions={questions} onSubmit={(r)=>{ addResponse(r); }} currentUser={currentUser} isManager={isManager} />}
+      {view === 'responder' && <Responder questions={questions} onSubmit={(r)=>{ addResponse(r); }} currentUser={currentUser} isManager={isManager} onViewResults={() => setView('feedbacks')} />}
       {view === 'resultados' && <Results questions={questions} responses={responses} currentUser={currentUser} />}
-      {view === 'respondentes' && <Respondents responses={responses} />}
+      {view === 'respondentes' && <Respondents responses={responses} questionnaires={questionnaires} />}
+      {view === 'feedbacks' && <Feedbacks currentUser={currentUser || null} responses={responses} />}
     </>
   );
 }
