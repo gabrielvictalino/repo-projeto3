@@ -3,6 +3,7 @@ import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea
 import injectQuestionarioStyles from './styles';
 import { EditIcon, TrashIcon, UserIcon, LightBulbIcon } from '../../components/Icons';
 import { useSearch } from '../../contexts/SearchContext';
+import ErrorNotification from '../../components/ErrorNotification';
 
 injectQuestionarioStyles();
 
@@ -407,6 +408,7 @@ function Responder({ questions, onSubmit, currentUser, isManager }: { questions:
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [answers, setAnswers] = useState<Record<string,string>>({});
   const [isResponding, setIsResponding] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   // Filter questionnaires based on search query
   const filteredQuestionnaires = questionnaires.filter(q => {
@@ -431,6 +433,20 @@ function Responder({ questions, onSubmit, currentUser, isManager }: { questions:
   
   function submit(){
     if (!selectedId) return;
+    
+    const sel = selectedQuestionnaire();
+    if (!sel || !sel.questions || sel.questions.length === 0) {
+      setErrorMessage('Este questionário não possui perguntas para responder.');
+      return;
+    }
+    
+    // Verificar se ao menos uma pergunta foi respondida
+    const answeredCount = Object.keys(answers).filter(key => answers[key] && answers[key].trim() !== '').length;
+    if (answeredCount === 0) {
+      setErrorMessage('Você precisa responder ao menos uma pergunta antes de enviar o questionário.');
+      return;
+    }
+    
     // Determine user ID - 'guest' if no user logged in
     const userId = currentUser ? currentUser.name : 'guest';
     const userName = currentUser ? currentUser.name : 'Visitante';
@@ -491,6 +507,12 @@ function Responder({ questions, onSubmit, currentUser, isManager }: { questions:
 
   return (
     <div className="sr-responder">
+      {errorMessage && (
+        <ErrorNotification
+          message={errorMessage}
+          onClose={() => setErrorMessage(null)}
+        />
+      )}
       <h2>Responder questionário</h2>
       {searchQuery && (
         <div style={{ marginBottom: 16, fontSize: 14, color: 'var(--sr-text-secondary)' }}>

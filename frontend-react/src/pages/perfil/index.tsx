@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { User } from '../../types/user';
 import injectPerfilStyles from './styles';
+import ErrorNotification from '../../components/ErrorNotification';
 
 injectPerfilStyles();
 
@@ -48,6 +49,7 @@ export default function Perfil({ user, onLogout }: PerfilProps) {
   });
 
   const [activeSection, setActiveSection] = useState<string>('external-accounts');
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleInputChange = (field: keyof UserProfile, value: string) => {
     setProfile(prev => ({ ...prev, [field]: value }));
@@ -82,6 +84,22 @@ export default function Perfil({ user, onLogout }: PerfilProps) {
   };
 
   const handleSave = () => {
+    // Validar campos obrigatórios
+    if (!profile.firstName.trim() || !profile.lastName.trim()) {
+      setErrorMessage('Por favor, preencha seu nome completo antes de salvar o perfil.');
+      return;
+    }
+    
+    if (!profile.cpf.trim()) {
+      setErrorMessage('O campo CPF é obrigatório para salvar seu perfil.');
+      return;
+    }
+    
+    if (!profile.birthDate) {
+      setErrorMessage('Por favor, informe sua data de nascimento.');
+      return;
+    }
+
     // Atualizar o user com os dados do perfil
     if (user) {
       const updatedUser = { ...user, avatarUrl: profile.avatarUrl };
@@ -91,6 +109,8 @@ export default function Perfil({ user, onLogout }: PerfilProps) {
         window.location.reload();
       } catch(e) {
         console.error('Erro ao salvar perfil:', e);
+        setErrorMessage('Ocorreu um erro ao salvar seu perfil. Tente novamente.');
+        return;
       }
     }
     alert('Perfil salvo com sucesso!');
@@ -98,6 +118,12 @@ export default function Perfil({ user, onLogout }: PerfilProps) {
 
   return (
     <div className="perfil-page">
+      {errorMessage && (
+        <ErrorNotification
+          message={errorMessage}
+          onClose={() => setErrorMessage(null)}
+        />
+      )}
       <div className="perfil-container">
         <button className="btn-back" onClick={() => navigate(-1)}>
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
