@@ -210,3 +210,41 @@ export const LogoutIcon = ({ size = 20 }: { size?: number }) => (
     <path d="M15 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H15M10 17L15 12M15 12L10 7M15 12H3" stroke="url(#logoutGrad)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
   </svg>
 );
+
+export const CheckIcon = ({ size = 20 }: { size?: number }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="checkGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" style={{stopColor: '#004b8d', stopOpacity: 1}} />
+        <stop offset="100%" style={{stopColor: '#00a99d', stopOpacity: 1}} />
+      </linearGradient>
+    </defs>
+    <path d="M20 6L9 17L4 12" stroke="url(#checkGrad)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+);
+
+export const ClockIcon = ({ size = 20 }: { size?: number }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="clockGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" style={{stopColor: '#004b8d', stopOpacity: 1}} />
+        <stop offset="100%" style={{stopColor: '#00a99d', stopOpacity: 1}} />
+      </linearGradient>
+    </defs>
+    <circle cx="12" cy="12" r="9" stroke="url(#clockGrad)" strokeWidth="2" fill="none"/>
+    <path d="M12 6V12L16 14" stroke="url(#clockGrad)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+);
+
+export const CalendarIcon = ({ size = 20 }: { size?: number }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="calendarGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" style={{stopColor: '#004b8d', stopOpacity: 1}} />
+        <stop offset="100%" style={{stopColor: '#ffd200', stopOpacity: 1}} />
+      </linearGradient>
+    </defs>
+    <rect x="3" y="4" width="18" height="18" rx="2" stroke="url(#calendarGrad)" strokeWidth="2" fill="none"/>
+    <path d="M16 2V6M8 2V6M3 10H21" stroke="url(#calendarGrad)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+);

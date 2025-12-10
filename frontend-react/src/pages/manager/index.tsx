@@ -5,6 +5,19 @@ import { UserIcon, ManagerIcon, TrashIcon, ChartIcon } from '../../components/Ic
 
 injectManagerStyles();
 
+const motivationalQuotes = [
+  "Liderança é a capacidade de transformar visão em realidade.",
+  "Um bom líder inspira as pessoas a terem confiança nele. Um grande líder inspira as pessoas a terem confiança em si mesmas.",
+  "O sucesso é a soma de pequenos esforços repetidos dia após dia.",
+  "Gerenciar é fazer as coisas certas; liderar é fazer as coisas corretas.",
+  "A melhor maneira de prever o futuro é criá-lo.",
+  "Feedback construtivo é a ferramenta mais poderosa de desenvolvimento.",
+  "Equipes motivadas produzem resultados extraordinários.",
+  "Delegação inteligente multiplica sua capacidade de realização.",
+  "O reconhecimento genuíno fortalece vínculos e aumenta o engajamento.",
+  "Comunicação clara evita 90% dos problemas de gestão."
+];
+
 export default function ManagerPanel() {
   const [users, setUsers] = useState<User[]>(() => {
     try {
@@ -17,6 +30,15 @@ export default function ManagerPanel() {
 
   const [showAddUser, setShowAddUser] = useState(false);
   const [newUser, setNewUser] = useState({ name: '', email: '', role: 'cliente' as 'manager' | 'cliente' });
+  const [currentQuoteIndex, setCurrentQuoteIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentQuoteIndex(prev => (prev + 1) % motivationalQuotes.length);
+    }, 5000); // Muda a cada 5 segundos
+
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     try {
@@ -55,6 +77,41 @@ export default function ManagerPanel() {
       <div className="panel-header">
         <h2>Painel de Gerenciamento</h2>
         <p className="subtitle">Gerencie usuários e questionários da plataforma</p>
+      </div>
+
+      {/* Faixa motivacional com carrossel */}
+      <div className="motivational-banner">
+        <button 
+          className="banner-arrow banner-arrow-left"
+          onClick={() => setCurrentQuoteIndex(prev => (prev - 1 + motivationalQuotes.length) % motivationalQuotes.length)}
+          aria-label="Frase anterior"
+        >
+          ‹
+        </button>
+        
+        <div className="banner-content">
+          <div className="banner-quote" key={currentQuoteIndex}>
+            {motivationalQuotes[currentQuoteIndex]}
+          </div>
+        </div>
+        
+        <button 
+          className="banner-arrow banner-arrow-right"
+          onClick={() => setCurrentQuoteIndex(prev => (prev + 1) % motivationalQuotes.length)}
+          aria-label="Próxima frase"
+        >
+          ›
+        </button>
+        
+        <div className="banner-dots">
+          {motivationalQuotes.map((_, index) => (
+            <span 
+              key={index}
+              className={`banner-dot ${index === currentQuoteIndex ? 'active' : ''}`}
+              onClick={() => setCurrentQuoteIndex(index)}
+            />
+          ))}
+        </div>
       </div>
 
       <div className="manager-sections">

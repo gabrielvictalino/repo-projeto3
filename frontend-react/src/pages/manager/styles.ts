@@ -27,6 +27,175 @@ const css = `
   opacity: 0.95;
 }
 
+/* Motivational Banner */
+.motivational-banner {
+  position: relative;
+  background: #e8f4f8;
+  padding: 32px 80px;
+  border-radius: 12px;
+  margin-bottom: 32px;
+  box-shadow: 0 2px 12px rgba(0, 75, 141, 0.08);
+  overflow: hidden;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+[data-theme="dark"] .motivational-banner {
+  background: #2a4858;
+}
+
+.banner-content {
+  flex: 1;
+  text-align: center;
+  padding: 0 20px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.banner-quote {
+  color: #004b8d;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.6;
+  animation: fadeIn 0.6s ease-in-out;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+[data-theme="dark"] .banner-quote {
+  color: #a8d5e2;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.banner-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 75, 141, 0.1);
+  border: 2px solid rgba(0, 75, 141, 0.2);
+  color: #004b8d;
+  font-size: 28px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  z-index: 2;
+  font-weight: 700;
+}
+
+[data-theme="dark"] .banner-arrow {
+  background: rgba(168, 213, 226, 0.1);
+  border-color: rgba(168, 213, 226, 0.2);
+  color: #a8d5e2;
+}
+
+.banner-arrow:hover {
+  background: rgba(0, 75, 141, 0.2);
+  border-color: rgba(0, 75, 141, 0.3);
+  transform: translateY(-50%) scale(1.1);
+}
+
+[data-theme="dark"] .banner-arrow:hover {
+  background: rgba(168, 213, 226, 0.2);
+  border-color: rgba(168, 213, 226, 0.3);
+}
+
+.banner-arrow-left {
+  left: 16px;
+}
+
+.banner-arrow-right {
+  right: 16px;
+}
+
+.banner-dots {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  z-index: 2;
+}
+
+.banner-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(0, 75, 141, 0.3);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+[data-theme="dark"] .banner-dot {
+  background: rgba(168, 213, 226, 0.3);
+}
+
+.banner-dot.active {
+  background: #004b8d;
+  width: 24px;
+  border-radius: 5px;
+}
+
+[data-theme="dark"] .banner-dot.active {
+  background: #a8d5e2;
+}
+
+.banner-dot:hover {
+  background: rgba(0, 75, 141, 0.5);
+}
+
+[data-theme="dark"] .banner-dot:hover {
+  background: rgba(168, 213, 226, 0.5);
+}
+
+@media (max-width: 768px) {
+  .motivational-banner {
+    padding: 20px 60px;
+    height: 140px;
+  }
+  
+  .banner-quote {
+    font-size: 15px;
+  }
+  
+  .banner-arrow {
+    width: 40px;
+    height: 40px;
+    font-size: 24px;
+  }
+  
+  .banner-arrow-left {
+    left: 8px;
+  }
+  
+  .banner-arrow-right {
+    right: 8px;
+  }
+}
+
 .manager-sections {
   display: flex;
   flex-direction: column;

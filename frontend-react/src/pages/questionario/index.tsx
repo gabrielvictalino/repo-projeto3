@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
 import injectQuestionarioStyles from './styles';
-import { EditIcon, TrashIcon, UserIcon, LightBulbIcon } from '../../components/Icons';
+import { EditIcon, TrashIcon, UserIcon, LightBulbIcon, UsersIcon, ChartIcon, DocumentIcon, ClockIcon, CheckIcon, CalendarIcon } from '../../components/Icons';
 import { useSearch } from '../../contexts/SearchContext';
 import ErrorNotification from '../../components/ErrorNotification';
 import Feedbacks from '../feedbacks';
@@ -14,7 +14,7 @@ export type View = 'criar' | 'responder' | 'resultados' | 'respondentes' | 'feed
 export type Question = {
   id: string;
   text: string;
-  type: 'text' | 'mcq';
+  type: 'text' | 'mcq' | 'satisfaction';
   options?: string[];
   required?: boolean;
 };
@@ -56,11 +56,12 @@ function Editor({ onSave }: { onSave: (qs: Question[]) => void }) {
   const [title, setTitle] = useState(editingQuestionnaire?.title || '');
   const [coverImage, setCoverImage] = useState<string>(editingQuestionnaire?.coverImage || COVER_IMAGES[0].url);
   const [questionnaireId, setQuestionnaireId] = useState<string | null>(editingQuestionnaire?.id || null);
-  const [type, setType] = useState<'text' | 'mcq'>('text');
+  const [type, setType] = useState<'text' | 'mcq' | 'satisfaction'>('text');
   const [optionsText, setOptionsText] = useState('');
   const [required, setRequired] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showPreview, setShowPreview] = useState(true);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   // Load available questionnaires on mount
   React.useEffect(() => {
@@ -162,6 +163,12 @@ function Editor({ onSave }: { onSave: (qs: Question[]) => void }) {
 
   return (
     <div className="sr-editor">
+      {errorMessage && (
+        <ErrorNotification
+          message={errorMessage}
+          onClose={() => setErrorMessage(null)}
+        />
+      )}
       <h2>{editorMode === 'create' ? 'Criar Novo Questionário' : `Editando: ${title || 'Questionário'}`}</h2>
       
       {/* Visual questionnaire grid selector */}
@@ -274,6 +281,7 @@ function Editor({ onSave }: { onSave: (qs: Question[]) => void }) {
             <select value={type} onChange={e => setType(e.target.value as any)}>
               <option value="text">Resposta curta</option>
               <option value="mcq">Múltipla escolha</option>
+              <option value="satisfaction">Satisfação (emojis)</option>
             </select>
           </div>
           <div style={{ display:'flex', alignItems:'center', gap:8 }}>
@@ -289,6 +297,11 @@ function Editor({ onSave }: { onSave: (qs: Question[]) => void }) {
         <div className="actions">
           <button onClick={addQuestion} className="primary">{editingId ? 'Atualizar pergunta' : 'Adicionar pergunta'}</button>
           <button onClick={() => {
+            // Validação: não permitir salvar questionário sem perguntas
+            if (questions.length === 0) {
+              setErrorMessage('Adicione pelo menos uma pergunta antes de salvar o questionário!');
+              return;
+            }
             // persist questionnaire with title and cover image to localStorage
             try{
               const qn = { 
@@ -460,6 +473,16 @@ function Responder({ questions, onSubmit, currentUser, isManager, onViewResults 
       return;
     }
     
+    // Verificar se todas as perguntas obrigatórias foram respondidas
+    const unansweredRequired = sel.questions.filter(q => 
+      q.required && (!answers[q.id] || answers[q.id].trim() === '')
+    );
+    
+    if (unansweredRequired.length > 0) {
+      setErrorMessage(`Por favor, responda ${unansweredRequired.length === 1 ? 'a pergunta obrigatória' : 'todas as perguntas obrigatórias'} antes de enviar.`);
+      return;
+    }
+    
     // Verificar se ao menos uma pergunta foi respondida
     const answeredCount = Object.keys(answers).filter(key => answers[key] && answers[key].trim() !== '').length;
     if (answeredCount === 0) {
@@ -598,7 +621,7 @@ function Responder({ questions, onSubmit, currentUser, isManager, onViewResults 
                     <div className="quiz-card-main" onClick={() => { setSelectedId(q.id); setAnswers({}); setIsResponding(true); }}>
                       <div className="title">{q.title || 'Sem título'}</div>
                       <div className="meta">
-                        📝 {q.questions.length} pergunta{q.questions.length !== 1 ? 's' : ''}
+                        {q.questions.length} pergunta{q.questions.length !== 1 ? 's' : ''}
                       </div>
                     </div>
                     {isManager && (
@@ -649,6 +672,44 @@ function Responder({ questions, onSubmit, currentUser, isManager, onViewResults 
                         placeholder="Digite sua resposta aqui..."
                         rows={3}
                       />
+                    ) : q.type === 'satisfaction' ? (
+                      <div className="satisfaction-scale">
+                        <div 
+                          className={`satisfaction-option ${answers[q.id]==='Péssimo' ? 'selected' : ''}`}
+                          onClick={()=>setAnswer(q.id,'Péssimo')}
+                        >
+                          <div className="satisfaction-emoji">😞</div>
+                          <div className="satisfaction-label">Péssimo</div>
+                        </div>
+                        <div 
+                          className={`satisfaction-option ${answers[q.id]==='Ruim' ? 'selected' : ''}`}
+                          onClick={()=>setAnswer(q.id,'Ruim')}
+                        >
+                          <div className="satisfaction-emoji">😐</div>
+                          <div className="satisfaction-label">Ruim</div>
+                        </div>
+                        <div 
+                          className={`satisfaction-option ${answers[q.id]==='Regular' ? 'selected' : ''}`}
+                          onClick={()=>setAnswer(q.id,'Regular')}
+                        >
+                          <div className="satisfaction-emoji">🙂</div>
+                          <div className="satisfaction-label">Regular</div>
+                        </div>
+                        <div 
+                          className={`satisfaction-option ${answers[q.id]==='Bom' ? 'selected' : ''}`}
+                          onClick={()=>setAnswer(q.id,'Bom')}
+                        >
+                          <div className="satisfaction-emoji">😊</div>
+                          <div className="satisfaction-label">Bom</div>
+                        </div>
+                        <div 
+                          className={`satisfaction-option ${answers[q.id]==='Ótimo' ? 'selected' : ''}`}
+                          onClick={()=>setAnswer(q.id,'Ótimo')}
+                        >
+                          <div className="satisfaction-emoji">😍</div>
+                          <div className="satisfaction-label">Ótimo</div>
+                        </div>
+                      </div>
                     ) : q.type === 'mcq' && (q.options||[]).length <= 5 && isRatingScale(q.options||[]) ? (
                       <div className="rating-scale">
                         {(q.options||[]).map((opt,idx)=>(
@@ -748,7 +809,7 @@ function Results({ questions, responses, currentUser }: { questions: Question[];
       {currentUser?.role === 'manager' && (
         <div className="responses-list">
           <div className="responses-header">
-            <h3>🎯 Respostas dos Usuários</h3>
+            <h3><span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}><ChartIcon size={24} />Respostas dos Usuários</span></h3>
             <p>Toque em um balão para ver detalhes</p>
           </div>
           <div className="response-cards">
@@ -774,8 +835,8 @@ function Results({ questions, responses, currentUser }: { questions: Question[];
                     <div className="bubble-user">{response.userName}</div>
                     <div className="bubble-title">{questionnaire.title}</div>
                     <div className="bubble-stats">
-                      <span className="stat-badge">✅ {answerCount}</span>
-                      <span className="stat-date">📅 {new Date(response.timestamp).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })}</span>
+                      <span className="stat-badge"><CheckIcon size={14} /> {answerCount}</span>
+                      <span className="stat-date"><CalendarIcon size={14} /> {new Date(response.timestamp).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })}</span>
                     </div>
                   </div>
                   <div className="bubble-arrow">›</div>
@@ -880,7 +941,7 @@ function Respondents({ responses, questionnaires }: { responses: any[]; question
   return (
     <div className="sr-respondents">
       <div className="respondents-header">
-        <h2>👥 Respondentes</h2>
+        <h2><span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}><UsersIcon size={26} />Respondentes</span></h2>
         <p>Veja quem já participou de cada questionário</p>
       </div>
       
@@ -895,7 +956,7 @@ function Respondents({ responses, questionnaires }: { responses: any[]; question
               className="questionnaire-group-header"
               style={{ '--group-color': colors[colorIndex] } as React.CSSProperties}
             >
-              <h3>📋 {questionnaireTitle}</h3>
+              <h3><span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}><DocumentIcon size={20} />{questionnaireTitle}</span></h3>
               <span className="respondents-count">{qResponses.length} respondente{qResponses.length !== 1 ? 's' : ''}</span>
             </div>
             
@@ -917,11 +978,11 @@ function Respondents({ responses, questionnaires }: { responses: any[]; question
                     <div className="respondent-content">
                       <div className="respondent-name">{r.userName || 'Anônimo'}</div>
                       <div className="respondent-stats">
-                        <span className="respondent-badge">✅ {answerCount}</span>
-                        {isGuest && <span className="guest-badge">👤 Visitante</span>}
+                        <span className="respondent-badge"><CheckIcon size={14} /> {answerCount}</span>
+                        {isGuest && <span className="guest-badge"><UserIcon size={12} /> Visitante</span>}
                         {r.timestamp && (
                           <span className="respondent-time">
-                            🕒 {new Date(r.timestamp).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                            <ClockIcon size={12} /> {new Date(r.timestamp).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
                           </span>
                         )}
                       </div>
