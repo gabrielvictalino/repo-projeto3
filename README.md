@@ -83,3 +83,12 @@ Fluxo:
 ![Manager – Card Criar Novo](docs/images/admin_new_form.png)
 
 ---
+
+# 📌 Conclusão
+
+O projeto **Questionários SEBRAE** demonstra uma solução completa para criação, gestão e resposta de questionários, integrando três perfis de uso distintos e fluxos bem definidos.  
+A aplicação oferece uma experiência clara e intuitiva tanto para visitantes quanto para usuários autenticados, além de disponibilizar ao gestor um conjunto eficiente de ferramentas para acompanhamento das respostas e envio de feedbacks.  
+
+O resultado final evidencia a integração entre design e desenvolvimento, refletindo uma interface moderna, funcional e alinhada aos objetivos propostos pelo projeto.
+
+---
