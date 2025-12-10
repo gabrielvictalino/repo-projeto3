@@ -6,9 +6,28 @@ O sistema foi desenvolvido para facilitar a coleta de dados, acompanhar feedback
 
 ---
 
+## 👥 Integrantes do Projeto
+
+### **Ciência da Computação**
+- Gabriel Victalino  
+- Leonardo Gutzeit  
+- Matheus Araujo  
+- Aline Takakura  
+- Julia Ventura  
+- Marco Veras  
+- Luana Fernandes  
+
+### **Design**
+- Leticia Pontes  
+- Pedro Luna  
+- Karina Bandeira  
+- João Pedro Moura  
+
+---
+
 ## 🧩 Perfis e Fluxos de Uso
 
-A seguir, uma visão geral da navegação realizada pelos três tipos de usuário, ilustrada com capturas de tela da aplicação.
+A seguir, uma visão geral da navegação realizada pelos três tipos de usuário.
 
 ---
 
@@ -39,7 +58,7 @@ Fluxo:
 **Login → Buscar questionário → Responder → Notificações e Feedbacks**
 
 ### **Login**
-![Cliente – Login](docs/images/client_login.png)
+![Cliente – Login](docs/images/client_login.jpeg)
 
 ### **Responder Questionário**
 ![Cliente – Pergunta](docs/images/visitor_question1.jpeg)
@@ -64,7 +83,3 @@ Fluxo:
 ![Manager – Card Criar Novo](docs/images/admin_new_form.png)
 
 ---
-
-
-
-
