@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import injectHeaderStyles from './styles-new';
 import type { User } from '../../../types/user';
+import { useSearch } from '../../../contexts/SearchContext';
 import { 
   HomeIcon, 
   PlusIcon, 
@@ -24,7 +25,7 @@ interface HeaderProps {
 }
 
 export default function Header({ subtitle, onLogin, user, onLogout }: HeaderProps){
-  const [searchQuery, setSearchQuery] = useState('');
+  const { searchQuery, setSearchQuery } = useSearch();
   const [showSearch, setShowSearch] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
 import injectQuestionarioStyles from './styles';
 import { EditIcon, TrashIcon, UserIcon, LightBulbIcon } from '../../components/Icons';
+import { useSearch } from '../../contexts/SearchContext';
 
 injectQuestionarioStyles();
 
@@ -386,6 +387,8 @@ function Editor({ onSave }: { onSave: (qs: Question[]) => void }) {
 type Questionnaire = { id: string; title: string; questions: Question[]; coverImage?: string };
 
 function Responder({ questions, onSubmit, currentUser, isManager }: { questions: Question[]; onSubmit: (r:any)=>void; currentUser?: { name: string; role: string } | null; isManager?: boolean }) {
+  const { searchQuery } = useSearch();
+  
   // Load saved questionnaires from localStorage (if any)
   const loadSaved = (): Questionnaire[] => {
     try {
@@ -404,6 +407,14 @@ function Responder({ questions, onSubmit, currentUser, isManager }: { questions:
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [answers, setAnswers] = useState<Record<string,string>>({});
   const [isResponding, setIsResponding] = useState(false);
+
+  // Filter questionnaires based on search query
+  const filteredQuestionnaires = questionnaires.filter(q => {
+    if (!searchQuery.trim()) return true;
+    const query = searchQuery.toLowerCase();
+    return q.title.toLowerCase().includes(query) ||
+           q.questions.some(question => question.text.toLowerCase().includes(query));
+  });
 
   // Helper function to detect if options represent a rating scale
   function isRatingScale(options: string[]): boolean {
@@ -467,14 +478,11 @@ function Responder({ questions, onSubmit, currentUser, isManager }: { questions:
   }
 
   function editQuestionnaire(id: string) {
-    // Store questionnaire ID for editing and navigate to editor
-    const questionnaire = questionnaires.find(q => q.id === id);
-    if (questionnaire) {
-      try {
-        localStorage.setItem('sr_editing_questionnaire', JSON.stringify(questionnaire));
-        window.location.href = '/criar';
-      } catch(e){}
-    }
+    const q = questionnaires.find(x => x.id === id);
+    if (!q) return;
+    setQuestionnaires([{ ...q, id: 'draft' }, ...questionnaires.filter(x => x.id !== id && x.id !== 'draft')]);
+    setSelectedId('draft');
+    setIsResponding(false);
   }
 
   if (!questionnaires || questionnaires.length === 0) return <div className="sr-empty">Nenhum questionário disponível. Crie um na aba "Criar".</div>;
@@ -484,49 +492,60 @@ function Responder({ questions, onSubmit, currentUser, isManager }: { questions:
   return (
     <div className="sr-responder">
       <h2>Responder questionário</h2>
+      {searchQuery && (
+        <div style={{ marginBottom: 16, fontSize: 14, color: 'var(--sr-text-secondary)' }}>
+          {filteredQuestionnaires.length} questionário{filteredQuestionnaires.length !== 1 ? 's' : ''} encontrado{filteredQuestionnaires.length !== 1 ? 's' : ''} para "{searchQuery}"
+        </div>
+      )}
       <div className="responder-wrap">
         {!isResponding && (
           <div className="quiz-grid">
-            {questionnaires.map(q => (
-              <div 
-                key={q.id} 
-                className={"quiz-card" + (q.id === selectedId ? ' selected' : '')}
-              >
-                <div 
-                  className="quiz-card-image" 
-                  style={{ backgroundImage: `url(${q.coverImage || COVER_IMAGES[0].url})` }}
-                  onClick={() => { setSelectedId(q.id); setAnswers({}); setIsResponding(true); }}
-                >
-                  <div className="quiz-card-overlay"></div>
-                </div>
-                <div className="quiz-card-content">
-                  <div className="quiz-card-main" onClick={() => { setSelectedId(q.id); setAnswers({}); setIsResponding(true); }}>
-                    <div className="title">{q.title || 'Sem título'}</div>
-                    <div className="meta">
-                      📝 {q.questions.length} pergunta{q.questions.length !== 1 ? 's' : ''}
-                    </div>
-                  </div>
-                  {isManager && (
-                    <div className="quiz-card-actions">
-                      <button 
-                        className="btn-edit" 
-                        onClick={(e) => { e.stopPropagation(); editQuestionnaire(q.id); }}
-                        title="Editar questionário"
-                      >
-                        <EditIcon size={14} />
-                      </button>
-                      <button 
-                        className="btn-delete-quiz" 
-                        onClick={(e) => { e.stopPropagation(); deleteQuestionnaire(q.id); }}
-                        title="Deletar questionário"
-                      >
-                        <TrashIcon size={14} />
-                      </button>
-                    </div>
-                  )}
-                </div>
+            {filteredQuestionnaires.length === 0 ? (
+              <div className="sr-empty">
+                {searchQuery ? `Nenhum questionário encontrado com "${searchQuery}"` : 'Nenhum questionário disponível. Crie um na aba "Criar".'}
               </div>
-            ))}
+            ) : (
+              filteredQuestionnaires.map(q => (
+                <div 
+                  key={q.id} 
+                  className={"quiz-card" + (q.id === selectedId ? ' selected' : '')}
+                >
+                  <div 
+                    className="quiz-card-image" 
+                    style={{ backgroundImage: `url(${q.coverImage || COVER_IMAGES[0].url})` }}
+                    onClick={() => { setSelectedId(q.id); setAnswers({}); setIsResponding(true); }}
+                  >
+                    <div className="quiz-card-overlay"></div>
+                  </div>
+                  <div className="quiz-card-content">
+                    <div className="quiz-card-main" onClick={() => { setSelectedId(q.id); setAnswers({}); setIsResponding(true); }}>
+                      <div className="title">{q.title || 'Sem título'}</div>
+                      <div className="meta">
+                        📝 {q.questions.length} pergunta{q.questions.length !== 1 ? 's' : ''}
+                      </div>
+                    </div>
+                    {isManager && (
+                      <div className="quiz-card-actions">
+                        <button 
+                          className="btn-edit" 
+                          onClick={(e) => { e.stopPropagation(); editQuestionnaire(q.id); }}
+                          title="Editar questionário"
+                        >
+                          <EditIcon size={14} />
+                        </button>
+                        <button 
+                          className="btn-delete" 
+                          onClick={(e) => { e.stopPropagation(); deleteQuestionnaire(q.id); }}
+                          title="Excluir questionário"
+                        >
+                          <TrashIcon size={14} />
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         )}
 

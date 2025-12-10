@@ -68,6 +68,7 @@ export default function Logon({ onLogin }: { onLogin: (user: User) => void }) {
 
       <div className="logon-wrapper">
         <div className="logon-card">
+          <form onSubmit={(e) => { e.preventDefault(); submit(); }}>
             <h2>Login</h2>
             <div className="field">
               <label>CPF</label>
@@ -89,9 +90,9 @@ export default function Logon({ onLogin }: { onLogin: (user: User) => void }) {
             {error && <div style={{ color: 'crimson', marginTop: 8, marginBottom: 16 }}>{error}</div>}
             
             <div className="actions">
-              <button className="primary" onClick={submit}>Entrar</button>
+              <button type="submit" className="primary">Entrar</button>
             </div>
-
+          </form>
             <div className="social-divider">
               <span>Se preferir, entre com outras contas:</span>
             </div>
