@@ -1,14 +1,70 @@
 # PROJETO 3
 
-## EQUIPE
-```
-Ciencia da Computacao       |       Design
-- Gabriel Victalino         |       - Leticia Pontes
-- Leonardo Gutzeit          |       - Pedro Luna
-- Matheus Araujo            |       - Karina Bandeira
-- Aline Takakura            |       - Joao Pedro Moura
-- Julia Ventura             |
-- Marco Veras               |
-- Luana Fernandes           |
-```
+# 📊 Questionários SEBRAE  
+Aplicação web para criação, gerenciamento e resposta de questionários, com diferentes perfis de acesso: Visitante, Cliente e Manager.  
+O sistema foi desenvolvido para facilitar a coleta de dados, acompanhar feedbacks e organizar respostas de forma simples e intuitiva.
+
+---
+
+## 🧩 Perfis e Fluxos de Uso
+
+A seguir, uma visão geral da navegação realizada pelos três tipos de usuário, ilustrada com capturas de tela da aplicação.
+
+---
+
+# 👤 **Visitante**
+
+Fluxo: **Página inicial → Seleção do questionário → Responder → Finalização**
+
+### **Página Inicial**
+![Visitante – Página Inicial](docs/images/visitor_home.png)
+
+### **Lista de Questionários**
+![Visitante – Lista](docs/images/visitor_list.png)
+
+### **Pergunta (Sim/Não)**
+![Visitante – Pergunta 1](docs/images/visitor_question1.jpeg)
+
+### **Pergunta (Campo texto + satisfação)**
+![Visitante – Pergunta 2](docs/images/visitor-question2.png)
+
+### **Tela de Finalização**
+![Visitante – Finalização](docs/images/visitor_finish.png)
+
+---
+
+# 🧑‍💼 **Cliente**
+
+Fluxo:  
+**Login → Buscar questionário → Responder → Notificações e Feedbacks**
+
+### **Login**
+![Cliente – Login](docs/images/client_login.png)
+
+### **Responder Questionário**
+![Cliente – Pergunta](docs/images/visitor_question1.jpeg)
+
+### **Feedbacks + Notificações**
+![Cliente – Notificações](docs/images/client_notifications.jpeg)
+
+---
+
+# 🛠️ **Manager (Gestor)**
+
+Fluxo:  
+**Painel → Criar questionário → Resultados / Respondentes / Feedbacks**
+
+### **Painel do Gestor**
+![Manager – Dashboard](docs/images/admin_dashboard.png)
+
+### **Criar Novo Questionário**
+![Manager – Tela de criação](docs/images/admin_create.png)
+
+### **Opções de Criação**
+![Manager – Card Criar Novo](docs/images/admin_new_form.png)
+
+---
+
+
+
 
