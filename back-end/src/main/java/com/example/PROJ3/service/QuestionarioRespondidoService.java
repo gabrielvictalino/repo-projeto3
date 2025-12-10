@@ -51,8 +51,16 @@ public class QuestionarioRespondidoService {
         return questionarioRespondidoRepository.findByQuestionarioId(questionarioId);
     }
 
+    public List<QuestionarioRespondido> findAllByUserId(int userId) {
+        return questionarioRespondidoRepository.findByUserId(userId);
+    }
+
     public java.util.Optional<QuestionarioRespondido> findById(int id) {
         return questionarioRespondidoRepository.findById(id);
+    }
+
+    public List<QuestionarioRespondido> findAll() {
+        return questionarioRespondidoRepository.findAll();
     }
 
     public boolean delete(int id) {
@@ -65,7 +73,6 @@ public class QuestionarioRespondidoService {
 
     public QuestionarioRespondido update(int id, List<com.example.PROJ3.DTO.RespostaDTO> newAnswers) {
         return questionarioRespondidoRepository.findById(id).map(qr -> {
-            // Update existing answers or add new ones
             newAnswers.forEach(dto -> {
                 qr.getRespostas().stream()
                         .filter(r -> r.getPerguntaId() == dto.getPerguntaId())

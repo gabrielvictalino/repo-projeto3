@@ -59,4 +59,8 @@ public class QuestionarioService {
             return questionarioRepository.save(questionario);
         }).orElse(null);
     }
+
+    public List<Questionario> listarAtivos() {
+        return questionarioRepository.findByStatus(com.example.PROJ3.enums.QuestionarioStatus.ATIVO);
+    }
 }

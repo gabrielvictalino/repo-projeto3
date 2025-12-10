@@ -30,7 +30,16 @@ public class QuestionarioController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PostMapping("/create")
+    @GetMapping("/find/active")
+    public ResponseEntity<List<Questionario>> getActiveQuestionarios() {
+        List<Questionario> ativos = questionarioService.listarAtivos();
+        if (ativos.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(ativos);
+    }
+
+    @PostMapping("/submit")
     public Questionario createQuestionario(@RequestBody Questionario questionario) {
         return questionarioService.save(questionario);
     }

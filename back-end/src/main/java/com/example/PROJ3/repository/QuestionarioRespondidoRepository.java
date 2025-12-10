@@ -7,4 +7,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface QuestionarioRespondidoRepository extends JpaRepository<QuestionarioRespondido, Integer> {
     java.util.List<QuestionarioRespondido> findByQuestionarioId(int questionarioId);
+
+    java.util.List<QuestionarioRespondido> findByUserId(int userId);
 }

@@ -13,11 +13,9 @@ public class QuestionarioRespondidoController {
     @Autowired
     private QuestionarioRespondidoService questionarioRespondidoService;
 
-    @GetMapping("/find/all/{questionarioId}")
-    public ResponseEntity<java.util.List<QuestionarioRespondido>> getAllResponsesByQuestionarioId(
-            @PathVariable int questionarioId) {
-        java.util.List<QuestionarioRespondido> responses = questionarioRespondidoService
-                .findAllByQuestionarioId(questionarioId);
+    @GetMapping("/find/all")
+    public ResponseEntity<java.util.List<QuestionarioRespondido>> getAllResponses() {
+        java.util.List<QuestionarioRespondido> responses = questionarioRespondidoService.findAll();
         if (responses.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
@@ -29,6 +27,26 @@ public class QuestionarioRespondidoController {
         return questionarioRespondidoService.findById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+        @GetMapping("/find/all/{questionarioId}")
+    public ResponseEntity<java.util.List<QuestionarioRespondido>> getAllResponsesByQuestionarioId(
+            @PathVariable int questionarioId) {
+        java.util.List<QuestionarioRespondido> responses = questionarioRespondidoService
+                .findAllByQuestionarioId(questionarioId);
+        if (responses.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(responses);
+    }
+
+    @GetMapping("/find/usuario/{userId}")
+    public ResponseEntity<java.util.List<QuestionarioRespondido>> getResponsesByUserId(@PathVariable int userId) {
+        java.util.List<QuestionarioRespondido> responses = questionarioRespondidoService.findAllByUserId(userId);
+        if (responses.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(responses);
     }
 
     @PostMapping("/submit")
