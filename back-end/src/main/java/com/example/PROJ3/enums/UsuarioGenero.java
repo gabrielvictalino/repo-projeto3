@@ -2,7 +2,7 @@ package com.example.PROJ3.enums;
 
 public enum UsuarioGenero {
     MASCULINO,
-    FEMIMINO,
+    FEMININO,
     OUTRO,
     PREFIRO_NAO_DIZER
 }
