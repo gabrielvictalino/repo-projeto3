@@ -40,6 +40,35 @@ O projeto foi configurado para rodar completamente em containers, facilitando a 
    docker-compose down
    ```
 
+### 🛠️ Comandos Úteis (Troubleshooting)
+
+Caso encontre problemas durante a execução, utilize os comandos abaixo para diagnóstico e correção:
+
+- **Ver logs em tempo real**:  
+  Essencial para identificar erros no backend ou banco de dados.
+  ```bash
+  docker-compose logs -f
+  # Ou para um serviço específico:
+  docker-compose logs -f backend
+  ```
+
+- **Reiniciar os containers**:
+  ```bash
+  docker-compose restart
+  ```
+
+- **Forçar rebuild das imagens**:  
+  Útil quando alterações no código ou dependências não são refletidas.
+  ```bash
+  docker-compose up --build
+  ```
+
+- **Limpar tudo (Resetar Banco de Dados)**:  
+  **Atenção:** Isso apagará todos os dados salvos no banco.
+  ```bash
+  docker-compose down -v
+  ```
+
 ## ⚙️ Configurações Importantes
 
 - **Frontend**: Roda na porta 8000 e utiliza Nginx como servidor web e proxy reverso.
@@ -51,19 +80,19 @@ O projeto foi configurado para rodar completamente em containers, facilitando a 
 ## 👥 Integrantes do Projeto
 
 ### **Ciência da Computação**
-- Gabriel Victalino  
-- Leonardo Gutzeit  
-- Matheus Araujo  
-- Aline Takakura  
-- Julia Ventura  
-- Marco Veras  
-- Luana Fernandes  
+- Aline Takakura
+- Gabriel Victalino
+- Julia Ventura
+- Leonardo Gutzeit
+- Luana Fernandes
+- Marco Veras
+- Matheus Araujo
 
 ### **Design**
-- Leticia Pontes  
+- João Pedro Moura
+- Karina Bandeira
+- Leticia Pontes
 - Pedro Luna  
-- Karina Bandeira  
-- João Pedro Moura  
 
 ---
 
