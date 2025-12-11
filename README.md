@@ -4,6 +4,48 @@
 Aplicação web para criação, gerenciamento e resposta de questionários, com diferentes perfis de acesso: Visitante, Cliente e Manager.  
 O sistema foi desenvolvido para facilitar a coleta de dados, acompanhar feedbacks e organizar respostas de forma simples e intuitiva.
 
+# 🚀 Como Rodar o Projeto
+
+## Pré-requisitos
+Certifique-se de ter instalado em sua máquina:
+- [Docker](https://www.docker.com/products/docker-desktop)
+- [Docker Compose](https://docs.docker.com/compose/install/)
+
+## Execução com Docker
+
+O projeto foi configurado para rodar completamente em containers, facilitando a execução em qualquer ambiente.
+
+### Passos para executar:
+
+1. **Clone o repositório** (se ainda não o fez):
+   ```bash
+   git clone <URL_DO_REPOSITORIO>
+   cd repo-projeto3
+   ```
+
+2. **Suba ou construa os containers**:
+   Na raiz do projeto (onde está o arquivo `docker-compose.yml`), execute:
+   ```bash
+   docker-compose up --build
+   ```
+   > Esse comando irá construir as imagens do backend e frontend, e iniciar o banco de dados MySQL.
+
+3. **Acesse a aplicação**:
+   - Frontend: [http://localhost:8000](http://localhost:8000) (Porta 8000)
+   - Backend API: `http://localhost/api` (Acessível via proxy reverso do frontend)
+
+4. **Parar a execução**:
+   Para parar os serviços, pressione `Ctrl+C` no terminal ou execute:
+   ```bash
+   docker-compose down
+   ```
+
+## ⚙️ Configurações Importantes
+
+- **Frontend**: Roda na porta 8000 e utiliza Nginx como servidor web e proxy reverso.
+- **Backend**: Roda na porta 8080 (internamente) e conecta-se ao banco de dados `db`.
+- **Database**: MySQL 8.0 rodando na porta 3307 (externamente) e 3306 (internamente).
+
 ---
 
 ## 👥 Integrantes do Projeto
@@ -90,5 +132,3 @@ O projeto **Questionários SEBRAE** demonstra uma solução completa para criaç
 A aplicação oferece uma experiência clara e intuitiva tanto para visitantes quanto para usuários autenticados, além de disponibilizar ao gestor um conjunto eficiente de ferramentas para acompanhamento das respostas e envio de feedbacks.  
 
 O resultado final evidencia a integração entre design e desenvolvimento, refletindo uma interface moderna, funcional e alinhada aos objetivos propostos pelo projeto.
-
----
