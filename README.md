@@ -19,7 +19,7 @@ O projeto foi configurado para rodar completamente em containers, facilitando a 
 
 1. **Clone o repositório** (se ainda não o fez):
    ```bash
-   git clone <URL_DO_REPOSITORIO>
+   git clone https://github.com/gabrielvictalino/repo-projeto3.git
    cd repo-projeto3
    ```
 
