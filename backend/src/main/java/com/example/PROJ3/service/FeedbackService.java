@@ -20,4 +20,11 @@ public class FeedbackService {
     public List<Feedback> findByUserId(int userId) {
         return feedbackRepository.findByUserId(userId);
     }
+    
+    public Feedback markAsRead(int id) {
+        return feedbackRepository.findById(id).map(feedback -> {
+            feedback.setRead(true);
+            return feedbackRepository.save(feedback);
+        }).orElse(null);
+    }
 }

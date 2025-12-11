@@ -27,6 +27,7 @@ public class Usuario {
     private String nome;
     private String sobrenome;
     private String email;
+    private String senha;
     private UsuarioTipo tipo;
     private UsuarioGenero genero;
     private UsuarioEscolaridade escolaridade;

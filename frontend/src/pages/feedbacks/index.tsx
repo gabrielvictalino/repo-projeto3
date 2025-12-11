@@ -5,13 +5,31 @@ import injectFeedbacksStyles from './styles';
 injectFeedbacksStyles();
 
 interface FeedbacksProps {
-  currentUser: { name: string; role: string } | null;
+  currentUser: { id?: string; name: string; role: string } | null;
   responses: any[];
 }
 
 export default function Feedbacks({ currentUser, responses }: FeedbacksProps) {
-  const { getUserFeedbacks, feedbacks, markFeedbackAsRead, notifications, markNotificationAsRead } = useFeedback();
+  const { getUserFeedbacks, feedbacks, markFeedbackAsRead, notifications, markNotificationAsRead, refreshFeedbacks, refreshNotifications } = useFeedback();
   const [selectedFeedback, setSelectedFeedback] = useState<any | null>(null);
+
+  // Load feedbacks and notifications when component mounts or user changes
+  React.useEffect(() => {
+    if (currentUser && (currentUser as any).id) {
+      const userId = (currentUser as any).id;
+      // Extract numeric ID
+      const match = userId.match(/\d+/);
+      const numericUserId = match ? parseInt(match[0]) : parseInt(userId) || 0;
+      
+      console.log('📥 [Feedbacks] Carregando feedbacks e notificações para:', currentUser);
+      console.log('UserId numérico:', numericUserId);
+      
+      if (numericUserId > 0) {
+        refreshFeedbacks(numericUserId);
+        refreshNotifications(numericUserId);
+      }
+    }
+  }, [currentUser, refreshFeedbacks, refreshNotifications]);
 
   const handleFeedbackClick = (feedback: any) => {
     setSelectedFeedback(feedback);
@@ -40,11 +58,21 @@ export default function Feedbacks({ currentUser, responses }: FeedbacksProps) {
 
   const isManager = currentUser.role === 'manager';
   
-  // Para clientes: feedbacks recebidos
-  // Para managers: feedbacks enviados
+  console.log('=== FEEDBACKS PAGE ===');
+  console.log('Current User:', currentUser);
+  console.log('Todos os feedbacks:', feedbacks);
+  console.log('É manager?', isManager);
+  
+  // Para clientes: feedbacks recebidos (filtrar por userId)
+  // Para managers: todos os feedbacks
   const userFeedbacks = isManager
-    ? feedbacks.filter(f => f.managerId === currentUser.name)
-    : getUserFeedbacks(currentUser.name);
+    ? feedbacks // Managers veem todos
+    : feedbacks.filter(f => {
+        console.log('Comparando feedback.userId:', f.userId, 'com currentUser.id:', (currentUser as any).id);
+        return f.userId === (currentUser as any).id;
+      });
+  
+  console.log('Feedbacks filtrados:', userFeedbacks);
 
   return (
     <div className="feedbacks-page">

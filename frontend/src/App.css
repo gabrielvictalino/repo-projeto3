@@ -7,7 +7,7 @@
 /* SEBRAE color palette (approximation) */
 :root{
   --sr-blue: #004b8d; /* primary */
-  --sr-accent: #ffd200; /* accent */
+  --sr-accent: #0066b3; /* accent */
   --sr-teal: #00a99d;
   --sr-bg: #f6f9fc;
   --sr-surface: #ffffff;
@@ -19,7 +19,7 @@
 /* Dark theme - azul marinho escuro */
 [data-theme="dark"]{
   --sr-blue: #4a90e2;
-  --sr-accent: #fbbf24;
+  --sr-accent: #5aa5e8;
   --sr-teal: #14b8a6;
   --sr-bg: #0a1628;
   --sr-surface: #162843;

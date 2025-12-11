@@ -42,9 +42,9 @@ const css = `
   width: 32px; 
   height: 32px; 
   border-radius: 4px; 
-  background: var(--sr-accent); 
+  background: transparent; 
   display: inline-block; 
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: none;
 }
 
 .sr-header .title{ 
@@ -97,7 +97,7 @@ const css = `
 }
 
 .header-nav .nav-item.active{
-  background: rgba(255,210,0,0.2);
+  background: rgba(255,255,255,0.2);
   color: white;
   font-weight: 600;
   animation: navItemActive 0.4s cubic-bezier(0.4, 0, 0.2, 1);

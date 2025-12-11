@@ -54,4 +54,8 @@ public class UsuarioService {
         }
         return false;
     }
+
+    public Usuario findByEmailAndSenha(String email, String senha) {
+        return usuarioRepository.findByEmailAndSenha(email, senha).orElse(null);
+    }
 }

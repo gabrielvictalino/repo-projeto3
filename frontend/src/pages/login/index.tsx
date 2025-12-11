@@ -3,6 +3,7 @@ import injectLogonStyles from './styles';
 import type { User, UserRole } from '../../types/user';
 import { validateCredentials } from '../../data/defaultUsers';
 import { LightBulbIcon } from '../../components/Icons';
+import { usuariosAPI } from '../../services/api';
 
 injectLogonStyles();
 
@@ -20,22 +21,36 @@ export default function Logon({ onLogin }: { onLogin: (user: User) => void }) {
     return () => clearTimeout(t);
   }, []);
 
-  function submit() {
+  async function submit() {
     setError(null);
     if (!name.trim()) { setError('Informe o nome de usuário'); return; }
     if (!password) { setError('Informe a senha'); return; }
     
-    // Validate against default users
-    const validUser = validateCredentials(name.trim(), password);
-    
-    if (!validUser) {
-      setError('Credenciais inválidas. Verifique nome e senha.');
-      return;
+    try {
+      // Try API login first
+      const apiUser = await usuariosAPI.login(name.trim(), password);
+      // Convert API user to frontend User type
+      const user: User = {
+        id: apiUser.id?.toString() || '',
+        name: apiUser.nome,
+        email: apiUser.email,
+        role: apiUser.tipo === 'MANAGER' ? 'manager' : 'cliente'
+      };
+      onLogin(user);
+      setName(''); 
+      setPassword('');
+    } catch (error) {
+      console.error('Erro no login via API, tentando validação local:', error);
+      // Fallback to local validation
+      const validUser = validateCredentials(name.trim(), password);
+      if (!validUser) {
+        setError('Credenciais inválidas. Verifique nome e senha.');
+        return;
+      }
+      onLogin(validUser);
+      setName(''); 
+      setPassword('');
     }
-    
-    onLogin(validUser);
-    setName(''); 
-    setPassword('');
   }
 
   if (loading) {
@@ -55,11 +70,12 @@ export default function Logon({ onLogin }: { onLogin: (user: User) => void }) {
       
       {/* SEBRAE Logo Header */}
       <div className="logon-header">
-        <svg className="logo-sebrae" viewBox="0 0 200 60" fill="white">
-          <rect x="20" y="10" width="160" height="8" />
-          <text x="100" y="35" textAnchor="middle" fontSize="24" fontWeight="bold" fill="white">SEBRAE</text>
-          <rect x="20" y="42" width="160" height="8" />
-        </svg>
+        <img 
+          src="/assets/sebrae-logo.gif" 
+          alt="SEBRAE Logo" 
+          className="logo-sebrae"
+          style={{ maxWidth: '200px', height: 'auto', marginBottom: '20px' }}
+        />
         <div className="logon-header-text">
           Para acessar as soluções do Sebrae e parceiros, insira seu CPF ou E-mail<br/>
           cadastrados ou crie uma conta. É rapidinho!

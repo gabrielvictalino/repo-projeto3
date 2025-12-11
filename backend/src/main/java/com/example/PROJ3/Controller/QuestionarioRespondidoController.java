@@ -52,11 +52,29 @@ public class QuestionarioRespondidoController {
     @PostMapping("/submit")
     public ResponseEntity<QuestionarioRespondido> submitResponse(
             @RequestBody com.example.PROJ3.DTO.QuestionarioSubmissionDTO submissionDTO) {
+        System.out.println("\n\n==================== CONTROLLER: /api/respostas/submit ====================");
+        System.out.println("Request Body recebido:");
+        System.out.println("  UserId: " + submissionDTO.getUserId());
+        System.out.println("  QuestionarioId: " + submissionDTO.getQuestionarioId());
+        System.out.println("  Timestamp: " + submissionDTO.getTimestamp());
+        System.out.println("  Respostas: " + (submissionDTO.getRespostas() != null ? submissionDTO.getRespostas().size() + " respostas" : "null"));
+        
+        if (submissionDTO.getRespostas() != null) {
+            for (com.example.PROJ3.DTO.RespostaDTO r : submissionDTO.getRespostas()) {
+                System.out.println("    - PerguntaId: " + r.getPerguntaId() + ", Resposta: " + r.getResposta());
+            }
+        }
+        
         QuestionarioRespondido savedResponse = questionarioRespondidoService.submitResponse(submissionDTO);
 
         if (savedResponse != null) {
+            System.out.println("✓ Resposta salva com sucesso! ID: " + savedResponse.getId());
+            System.out.println("  Número de RespostaUsuario: " + (savedResponse.getRespostas() != null ? savedResponse.getRespostas().size() : 0));
+            System.out.println("===========================================================================\n\n");
             return ResponseEntity.ok(savedResponse);
         } else {
+            System.out.println("✗ ERRO ao salvar resposta!");
+            System.out.println("===========================================================================\n\n");
             return ResponseEntity.badRequest().build();
         }
     }

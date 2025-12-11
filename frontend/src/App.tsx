@@ -15,6 +15,7 @@ import type { User } from './types/user';
 import { MoonIcon, SunIcon } from './components/Icons';
 import { SearchProvider } from './contexts/SearchContext';
 import { FeedbackProvider } from './contexts/FeedbackContext';
+import { questionariosAPI, respostasAPI } from './services/api';
 
 // Animated wrapper component
 function AnimatedRoute({ children }: { children: React.ReactNode }) {
@@ -27,18 +28,9 @@ function AnimatedRoute({ children }: { children: React.ReactNode }) {
 
 function App() {
   const [questions, setQuestions] = useState<Question[]>([]);
-  const [responses, setResponses] = useState<any[]>(() => {
-    try { 
-      const raw = localStorage.getItem('sr_responses'); 
-      return raw ? JSON.parse(raw) : [];
-    } catch(e){ return []; }
-  });
-  const [questionnaires, setQuestionnaires] = useState<any[]>(() => {
-    try {
-      const raw = localStorage.getItem('sr_questionarios');
-      return raw ? JSON.parse(raw) : [];
-    } catch(e) { return []; }
-  });
+  const [responses, setResponses] = useState<any[]>([]);
+  const [questionnaires, setQuestionnaires] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<User | null>(() => {
     try { const raw = localStorage.getItem('sr_user'); return raw ? JSON.parse(raw) as User : null; } catch(e){ return null; }
   });
@@ -48,6 +40,61 @@ function App() {
       return (saved === 'dark' ? 'dark' : 'light') as 'light' | 'dark';
     } catch(e){ return 'light'; }
   });
+
+  // Load data from API on mount
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const [questData, respData] = await Promise.all([
+          questionariosAPI.getAll(),
+          respostasAPI.getAll()
+        ]);
+        setQuestionnaires(questData);
+        
+        console.log('=== Carregando respostas da API ===');
+        console.log('Respostas da API:', respData);
+        
+        // Convert API responses to frontend format
+        const convertedResponses = respData.map(apiResp => {
+          // Convert respostas array to answers object
+          const answers: Record<string, string> = {};
+          apiResp.respostas.forEach((r: any) => {
+            answers[r.perguntaId.toString()] = r.resposta;
+          });
+          
+          // Convert numeric userId back to usr_XXX format
+          const userIdStr = `usr_${String(apiResp.userId).padStart(3, '0')}`;
+          
+          const converted = {
+            id: apiResp.id?.toString() || String(Date.now()),
+            questionnaireId: apiResp.questionarioId.toString(),
+            answers: answers,
+            userId: userIdStr,
+            userName: userIdStr, // TODO: buscar nome do usuário
+            timestamp: apiResp.timestamp || new Date().toISOString()
+          };
+          
+          console.log('Resposta convertida:', converted);
+          return converted;
+        });
+        
+        console.log('Total de respostas convertidas:', convertedResponses.length);
+        setResponses(convertedResponses);
+      } catch (error) {
+        console.error('Erro ao carregar dados da API, usando localStorage:', error);
+        // Fallback to localStorage
+        try {
+          const rawQ = localStorage.getItem('sr_questionarios');
+          const rawR = localStorage.getItem('sr_responses');
+          if (rawQ) setQuestionnaires(JSON.parse(rawQ));
+          if (rawR) setResponses(JSON.parse(rawR));
+        } catch(e) {}
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadData();
+  }, []);
 
   // Apply theme to document
   useEffect(() => {
@@ -72,20 +119,114 @@ function App() {
     navigate('/');
   }
 
-  function handleSubmitResponse(resp: any) {
-    setResponses(prev => {
-      const updated = [resp, ...prev];
-      // Persist to localStorage
-      try {
-        localStorage.setItem('sr_responses', JSON.stringify(updated));
-      } catch(e) {}
-      return updated;
-    });
-    // Navigate to home after submission
-    navigate(user ? '/home' : '/');
+  async function handleSubmitResponse(resp: any) {
+    try {
+      console.log('=== Enviando resposta do cliente ===');
+      console.log('Resposta original:', resp);
+      console.log('Answers:', resp.answers);
+      
+      // Convert frontend format to API format
+      const respostasArray = Object.entries(resp.answers).map(([perguntaId, resposta]) => {
+        console.log(`Pergunta ID: ${perguntaId}, Resposta: ${resposta}`);
+        return {
+          perguntaId: parseInt(perguntaId),
+          resposta: resposta as string
+        };
+      });
+      
+      console.log('RespostasArray convertido:', respostasArray);
+      
+      // Extract numeric ID from user.id (e.g., "usr_004" -> 4, or direct number)
+      let userId = 0;
+      if (user?.id) {
+        // Try to extract number from string like "usr_004" or "4"
+        const match = user.id.match(/\d+/);
+        userId = match ? parseInt(match[0]) : parseInt(user.id) || 0;
+      } else if (resp.userId) {
+        userId = parseInt(resp.userId) || 0;
+      }
+      
+      console.log('User logado:', user);
+      console.log('User ID original:', user?.id);
+      console.log('User ID numérico extraído:', userId);
+      
+      const apiPayload = {
+        userId: userId,
+        questionarioId: parseInt(resp.questionnaireId),
+        respostas: respostasArray,
+        timestamp: resp.timestamp
+      };
+      
+      console.log('Payload final para API:', apiPayload);
+      
+      // Try to submit to API
+      const submitted = await respostasAPI.submit(apiPayload);
+      console.log('Resposta da API:', submitted);
+      
+      // Reload all responses from API to ensure consistency
+      console.log('✓ Resposta enviada com sucesso! Recarregando todas as respostas...');
+      await reloadResponses();
+      
+      // Navigate to home after submission
+      navigate(user ? '/home' : '/');
+    } catch (error) {
+      console.error('Erro ao enviar resposta para API, salvando no localStorage:', error);
+      // Fallback to localStorage
+      setResponses(prev => {
+        const updated = [resp, ...prev];
+        try {
+          localStorage.setItem('sr_responses', JSON.stringify(updated));
+        } catch(e) {}
+        return updated;
+      });
+      navigate(user ? '/home' : '/');
+    }
   }
 
   function handleLogout(){ setUser(null); try{ localStorage.removeItem('sr_user'); }catch(e){} navigate('/'); }
+
+  // Function to reload responses from API
+  async function reloadResponses() {
+    try {
+      console.log('=== Recarregando respostas da API ===');
+      console.log('Timestamp:', new Date().toLocaleTimeString());
+      const respData = await respostasAPI.getAll();
+      console.log('Respostas recarregadas da API:', respData);
+      console.log('Número de respostas:', respData.length);
+      
+      const convertedResponses = respData.map(apiResp => {
+        const answers: Record<string, string> = {};
+        apiResp.respostas.forEach((r: any) => {
+          answers[r.perguntaId.toString()] = r.resposta;
+        });
+        
+        // Convert numeric userId back to usr_XXX format
+        const userIdStr = `usr_${String(apiResp.userId).padStart(3, '0')}`;
+        
+        return {
+          id: apiResp.id?.toString() || String(Date.now()),
+          questionnaireId: apiResp.questionarioId.toString(),
+          answers: answers,
+          userId: userIdStr,
+          userName: userIdStr,
+          timestamp: apiResp.timestamp || new Date().toISOString()
+        };
+      });
+      console.log('Respostas convertidas no reload:', convertedResponses);
+      setResponses(convertedResponses);
+    } catch (error) {
+      console.error('Erro ao recarregar respostas:', error);
+    }
+  }
+
+  // Reload responses when user logs in or navigates to results/feedbacks
+  useEffect(() => {
+    if (user && (location.pathname.includes('resultados') || location.pathname.includes('feedbacks') || location.pathname.includes('respondentes'))) {
+      console.log('🔄 Detectada navegação para página de respostas, recarregando...');
+      console.log('Caminho atual:', location.pathname);
+      reloadResponses();
+    }
+  }, [location.pathname, user]);
 
   return (
     <FeedbackProvider>

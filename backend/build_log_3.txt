@@ -1,3 +1,0 @@
-[INFO] Scanning for projects...
-^CDeseja finalizar o arquivo em lotes (S/N)? 
-^CA sintaxe do comando est  incorreta.

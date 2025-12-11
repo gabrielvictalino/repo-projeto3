@@ -28,7 +28,7 @@ interface HeaderProps {
 
 export default function Header({ subtitle, onLogin, user, onLogout }: HeaderProps){
   const { searchQuery, setSearchQuery } = useSearch();
-  const { getUnreadCount } = useFeedback();
+  const { getUnreadCount, refreshNotifications } = useFeedback();
   const [showSearch, setShowSearch] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const navigate = useNavigate();
@@ -36,6 +36,18 @@ export default function Header({ subtitle, onLogin, user, onLogout }: HeaderProp
 
   const isManager = user?.role === 'manager';
   const isCliente = user?.role === 'cliente';
+  
+  // Load notifications when user logs in
+  React.useEffect(() => {
+    if (user?.id) {
+      const match = user.id.match(/\d+/);
+      const numericUserId = match ? parseInt(match[0]) : parseInt(user.id) || 0;
+      if (numericUserId > 0) {
+        console.log('🔔 [Header] Carregando notificações para userId:', numericUserId);
+        refreshNotifications(numericUserId);
+      }
+    }
+  }, [user, refreshNotifications]);
 
   // Menu items based on role
   const getNavItems = () => {
@@ -69,7 +81,12 @@ export default function Header({ subtitle, onLogin, user, onLogout }: HeaderProp
     <header className="sr-header">
       {/* Logo and Title */}
       <div className="brand" onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
-        <div className="logo" />
+        <img 
+          src="/assets/sebrae-logo.gif" 
+          alt="SEBRAE Logo" 
+          className="logo"
+          style={{ height: '50px', width: 'auto', marginRight: '15px' }}
+        />
         <div>
           <div className="title">Questionários SEBRAE</div>
           {subtitle && <div className="subtitle">{subtitle}</div>}
@@ -125,8 +142,8 @@ export default function Header({ subtitle, onLogin, user, onLogout }: HeaderProp
               onClick={() => setShowNotifications(!showNotifications)}
             >
               <BellIcon size={18} />
-              {getUnreadCount(user.name) > 0 && (
-                <span className="badge">{getUnreadCount(user.name)}</span>
+              {getUnreadCount(user.id) > 0 && (
+                <span className="badge">{getUnreadCount(user.id)}</span>
               )}
             </button>
             <button className="header-btn profile-info" onClick={() => navigate('/perfil')} title="Ver perfil">
@@ -152,7 +169,7 @@ export default function Header({ subtitle, onLogin, user, onLogout }: HeaderProp
       {/* Notifications Panel */}
       {showNotifications && user && (
         <NotificationsPanel
-          userId={user.name}
+          userId={user.id}
           onClose={() => setShowNotifications(false)}
         />
       )}

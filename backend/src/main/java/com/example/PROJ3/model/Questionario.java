@@ -19,6 +19,9 @@ public class Questionario {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String titulo;
+    
+    @Column(length = 500)
+    private String coverImage;
 
     @Enumerated(EnumType.STRING)
     private QuestionarioStatus status = QuestionarioStatus.INATIVO;

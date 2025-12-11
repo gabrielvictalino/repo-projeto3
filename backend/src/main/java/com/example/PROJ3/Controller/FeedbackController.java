@@ -29,4 +29,13 @@ public class FeedbackController {
         }
         return ResponseEntity.ok(feedbacks);
     }
+    
+    @PutMapping("/mark-read/{id}")
+    public ResponseEntity<Feedback> markAsRead(@PathVariable int id) {
+        Feedback feedback = feedbackService.markAsRead(id);
+        if (feedback != null) {
+            return ResponseEntity.ok(feedback);
+        }
+        return ResponseEntity.notFound().build();
+    }
 }

@@ -27,12 +27,12 @@ const css = `
 }
 
 .sr-header .brand .logo{ 
-  width: 32px; 
-  height: 32px; 
-  border-radius: 4px; 
-  background: var(--sr-accent); 
+  width: auto; 
+  height: 50px; 
+  border-radius: 0; 
+  background: transparent; 
   display: inline-block; 
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: none;
 }
 
 .sr-header .title{ 

@@ -13,7 +13,16 @@ export default function NotificationsPanel({ userId, onClose }: NotificationsPan
   const { notifications, markNotificationAsRead } = useFeedback();
   const navigate = useNavigate();
 
-  const userNotifications = notifications.filter((n: Notification) => n.userId === userId);
+  console.log('=== NOTIFICATIONS PANEL ===');
+  console.log('UserId do painel:', userId);
+  console.log('Todas as notificações:', notifications);
+  
+  const userNotifications = notifications.filter((n: Notification) => {
+    console.log('Comparando notif.userId:', n.userId, 'com userId:', userId);
+    return n.userId === userId;
+  });
+  
+  console.log('Notificações filtradas:', userNotifications);
 
   const handleNotificationClick = (notifId: string, feedbackId?: string) => {
     markNotificationAsRead(notifId);

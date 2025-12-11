@@ -6,6 +6,8 @@ import { useSearch } from '../../contexts/SearchContext';
 import ErrorNotification from '../../components/ErrorNotification';
 import Feedbacks from '../feedbacks';
 import ResponseModal from '../../components/ResponseModal';
+import { questionariosAPI, respostasAPI } from '../../services/api';
+import type { Questionario } from '../../services/api';
 
 injectQuestionarioStyles();
 
@@ -65,12 +67,35 @@ function Editor({ onSave }: { onSave: (qs: Question[]) => void }) {
 
   // Load available questionnaires on mount
   React.useEffect(() => {
-    try {
-      const raw = localStorage.getItem('sr_questionarios');
-      if (raw) {
-        setAvailableQuestionnaires(JSON.parse(raw));
+    async function loadQuestionnaires() {
+      try {
+        const apiQuestionnaires = await questionariosAPI.getAll();
+        // Convert API format to component format
+        const converted = apiQuestionnaires.map((q: Questionario) => ({
+          id: q.id?.toString() || String(Date.now()),
+          title: q.titulo,
+          coverImage: q.coverImage,
+          questions: q.perguntas.map(p => ({
+            id: p.id || String(Date.now()),
+            text: p.conteudo,
+            type: (p.perguntaTipo === 'TEXT' ? 'text' : p.perguntaTipo === 'SATISFACTION' ? 'satisfaction' : 'mcq') as 'text' | 'mcq' | 'satisfaction',
+            options: p.options ? JSON.parse(p.options) : undefined,
+            required: p.required || false
+          }))
+        }));
+        setAvailableQuestionnaires(converted);
+      } catch (error) {
+        console.error('Erro ao carregar questionários da API:', error);
+        // Fallback to localStorage
+        try {
+          const raw = localStorage.getItem('sr_questionarios');
+          if (raw) {
+            setAvailableQuestionnaires(JSON.parse(raw));
+          }
+        } catch(e) {}
       }
-    } catch(e) {}
+    }
+    loadQuestionnaires();
   }, []);
 
   // Handle mode change
@@ -113,18 +138,28 @@ function Editor({ onSave }: { onSave: (qs: Question[]) => void }) {
   }
 
   // Delete questionnaire from editor
-  function deleteQuestionnaireFromEditor(id: string, e: React.MouseEvent) {
+  async function deleteQuestionnaireFromEditor(id: string, e: React.MouseEvent) {
     e.stopPropagation();
     const questionnaire = availableQuestionnaires.find(q => q.id === id);
     if (!questionnaire) return;
     
     if (!window.confirm(`Tem certeza que deseja excluir o questionário "${questionnaire.title}"?`)) return;
     
-    const updated = availableQuestionnaires.filter(q => q.id !== id);
-    setAvailableQuestionnaires(updated);
     try {
-      localStorage.setItem('sr_questionarios', JSON.stringify(updated));
-    } catch(e) {}
+      // Try to delete from API
+      await questionariosAPI.delete(parseInt(id));
+      const updated = availableQuestionnaires.filter(q => q.id !== id);
+      setAvailableQuestionnaires(updated);
+      alert('Questionário excluído com sucesso!');
+    } catch (error) {
+      console.error('Erro ao excluir questionário da API:', error);
+      // Fallback to localStorage
+      const updated = availableQuestionnaires.filter(q => q.id !== id);
+      setAvailableQuestionnaires(updated);
+      try {
+        localStorage.setItem('sr_questionarios', JSON.stringify(updated));
+      } catch(e) {}
+    }
     
     // Reset form if deleting currently edited questionnaire
     if (selectedQuestionnaireForEdit === id) {
@@ -296,41 +331,83 @@ function Editor({ onSave }: { onSave: (qs: Question[]) => void }) {
         )}
         <div className="actions">
           <button onClick={addQuestion} className="primary">{editingId ? 'Atualizar pergunta' : 'Adicionar pergunta'}</button>
-          <button onClick={() => {
+          <button onClick={async () => {
             // Validação: não permitir salvar questionário sem perguntas
             if (questions.length === 0) {
               setErrorMessage('Adicione pelo menos uma pergunta antes de salvar o questionário!');
               return;
             }
-            // persist questionnaire with title and cover image to localStorage
-            try{
-              const qn = { 
-                id: questionnaireId || String(Date.now()), 
-                title: title || `Questionário ${new Date().toLocaleString()}`, 
-                questions, 
-                coverImage 
+            
+            try {
+              // Prepare questionnaire data for API
+              const apiQuestionnaire: Questionario = {
+                titulo: title || `Questionário ${new Date().toLocaleString()}`,
+                coverImage: coverImage,
+                perguntas: questions.map(q => ({
+                  conteudo: q.text,
+                  perguntaTipo: q.type === 'text' ? 'TEXT' : q.type === 'satisfaction' ? 'SATISFACTION' : 'MULTIPLA_ESCOLHA',
+                  options: q.options ? JSON.stringify(q.options) : undefined,
+                  required: q.required || false
+                }))
               };
-              const raw = localStorage.getItem('sr_questionarios');
-              const arr = raw ? JSON.parse(raw) : [];
-              
-              // Check if updating existing questionnaire
-              const existingIndex = arr.findIndex((q: Questionnaire) => q.id === qn.id);
-              if (existingIndex !== -1) {
-                arr[existingIndex] = qn;
-                alert('Questionário atualizado!');
+
+              if (questionnaireId) {
+                // Update existing questionnaire
+                await questionariosAPI.update(parseInt(questionnaireId), apiQuestionnaire);
+                alert('Questionário atualizado com sucesso!');
               } else {
-                arr.unshift(qn);
-                alert('Questionário salvo!');
+                // Create new questionnaire
+                const created = await questionariosAPI.create(apiQuestionnaire);
+                setQuestionnaireId(created.id?.toString() || null);
+                alert('Questionário salvo com sucesso!');
               }
               
-              localStorage.setItem('sr_questionarios', JSON.stringify(arr));
+              // Reload questionnaires list
+              const updated = await questionariosAPI.getAll();
+              const converted = updated.map((q: Questionario) => ({
+                id: q.id?.toString() || String(Date.now()),
+                title: q.titulo,
+                coverImage: q.coverImage,
+                questions: q.perguntas.map(p => ({
+                  id: p.id || String(Date.now()),
+                  text: p.conteudo,
+                  type: (p.perguntaTipo === 'TEXT' ? 'text' : p.perguntaTipo === 'SATISFACTION' ? 'satisfaction' : 'mcq') as 'text' | 'mcq' | 'satisfaction',
+                  options: p.options ? JSON.parse(p.options) : undefined,
+                  required: p.required || false
+                }))
+              }));
+              setAvailableQuestionnaires(converted);
               
               // Reset form
               setQuestions([]);
               setTitle('');
               setCoverImage(COVER_IMAGES[0].url);
               setQuestionnaireId(null);
-            }catch(e){}
+              setShowSelector(true);
+            } catch (error) {
+              console.error('Erro ao salvar questionário na API:', error);
+              alert('Erro ao salvar questionário. Tente novamente.');
+              // Fallback to localStorage
+              try{
+                const qn = { 
+                  id: questionnaireId || String(Date.now()), 
+                  title: title || `Questionário ${new Date().toLocaleString()}`, 
+                  questions, 
+                  coverImage 
+                };
+                const raw = localStorage.getItem('sr_questionarios');
+                const arr = raw ? JSON.parse(raw) : [];
+                
+                const existingIndex = arr.findIndex((q: Questionnaire) => q.id === qn.id);
+                if (existingIndex !== -1) {
+                  arr[existingIndex] = qn;
+                } else {
+                  arr.unshift(qn);
+                }
+                
+                localStorage.setItem('sr_questionarios', JSON.stringify(arr));
+              }catch(e){}
+            }
             onSave(questions);
           }} className="secondary">{questionnaireId ? 'Atualizar questionário' : 'Salvar questionário'}</button>
         </div>
@@ -405,20 +482,43 @@ type Questionnaire = { id: string; title: string; questions: Question[]; coverIm
 function Responder({ questions, onSubmit, currentUser, isManager, onViewResults }: { questions: Question[]; onSubmit: (r:any)=>void; currentUser?: { name: string; role: string } | null; isManager?: boolean; onViewResults?: () => void }) {
   const { searchQuery } = useSearch();
   
-  // Load saved questionnaires from localStorage (if any)
-  const loadSaved = (): Questionnaire[] => {
-    try {
-      const raw = localStorage.getItem('sr_questionarios');
-      const parsed = raw ? JSON.parse(raw) : [];
-      if (Array.isArray(parsed)) return parsed;
-    } catch (e) { /* ignore */ }
-    return [];
-  };
+  const [questionnaires, setQuestionnaires] = useState<Questionnaire[]>([]);
 
-  const [questionnaires, setQuestionnaires] = useState<Questionnaire[]>(() => {
-    const saved = loadSaved();
-    return saved;
-  });
+  // Load questionnaires from API on mount
+  React.useEffect(() => {
+    async function loadQuestionnaires() {
+      try {
+        const apiQuestionnaires = await questionariosAPI.getAll();
+        console.log('[Responder] Questionários carregados da API:', apiQuestionnaires);
+        const converted = apiQuestionnaires.map((q: Questionario) => ({
+          id: q.id?.toString() || String(Date.now()),
+          title: q.titulo,
+          coverImage: q.coverImage,
+          questions: q.perguntas.map(p => {
+            console.log('[Responder] Pergunta da API - ID:', p.id, 'Conteúdo:', p.conteudo);
+            return {
+              id: p.id?.toString() || String(Date.now()),
+              text: p.conteudo,
+              type: (p.perguntaTipo === 'TEXT' ? 'text' : p.perguntaTipo === 'SATISFACTION' ? 'satisfaction' : 'mcq') as 'text' | 'mcq' | 'satisfaction',
+              options: p.options ? JSON.parse(p.options) : undefined,
+              required: p.required || false
+            };
+          })
+        }));
+        console.log('[Responder] Questionários convertidos:', converted);
+        setQuestionnaires(converted);
+      } catch (error) {
+        console.error('Erro ao carregar questionários da API:', error);
+        // Fallback to localStorage
+        try {
+          const raw = localStorage.getItem('sr_questionarios');
+          const parsed = raw ? JSON.parse(raw) : [];
+          if (Array.isArray(parsed)) setQuestionnaires(parsed);
+        } catch (e) {}
+      }
+    }
+    loadQuestionnaires();
+  }, []);
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [answers, setAnswers] = useState<Record<string,string>>({});
@@ -453,12 +553,12 @@ function Responder({ questions, onSubmit, currentUser, isManager, onViewResults 
 
   // Helper function to detect if options represent a rating scale
   function isRatingScale(options: string[]): boolean {
-    // Check if options look like a rating scale (numbers, very short text, or emojis)
-    return options.every(opt => {
+    // Check if options look like a rating scale (ONLY numbers 1-5 or specific rating words)
+    // This prevents regular MCQ from being converted to emojis
+    return options.length >= 3 && options.length <= 5 && options.every(opt => {
       const trimmed = opt.trim().toLowerCase();
-      return /^\d+$/.test(trimmed) || // Just numbers
-             trimmed.length <= 15 || // Short labels
-             /ruim|péssimo|regular|bom|ótimo|excelente|muito/i.test(trimmed); // Common rating words
+      return /^[1-5]$/.test(trimmed) || // Just numbers 1-5
+             /^(péssimo|ruim|regular|bom|ótimo|excelente)$/i.test(trimmed); // Exact rating words only
     });
   }
 
@@ -523,24 +623,52 @@ function Responder({ questions, onSubmit, currentUser, isManager, onViewResults 
     return questionnaires.find(q => q.id === selectedId);
   }
 
-  function saveSelectedAsNew(title?: string){
+  async function saveSelectedAsNew(title?: string){
     const sel = selectedQuestionnaire();
     if (!sel) return;
-    const item: Questionnaire = { id: String(Date.now()), title: title || (`Questionário ${new Date().toLocaleString()}`), questions: sel.questions };
-    const updated = [item, ...questionnaires.filter(q=>q.id !== 'draft')];
-    setQuestionnaires(updated);
-    try { localStorage.setItem('sr_questionarios', JSON.stringify(updated.filter(q=>q.id !== 'draft'))); } catch(e){}
-    setSelectedId(item.id);
+    
+    try {
+      const apiQuestionnaire: Questionario = {
+        titulo: title || `Questionário ${new Date().toLocaleString()}`,
+        perguntas: sel.questions.map(q => ({
+          conteudo: q.text,
+          perguntaTipo: q.type === 'text' ? 'TEXT' : q.type === 'satisfaction' ? 'SATISFACTION' : 'MULTIPLA_ESCOLHA',
+          options: q.options ? JSON.stringify(q.options) : undefined,
+          required: q.required || false
+        }))
+      };
+      
+      const created = await questionariosAPI.create(apiQuestionnaire);
+      const item: Questionnaire = { 
+        id: created.id?.toString() || String(Date.now()), 
+        title: title || (`Questionário ${new Date().toLocaleString()}`), 
+        questions: sel.questions 
+      };
+      const updated = [item, ...questionnaires.filter(q=>q.id !== 'draft')];
+      setQuestionnaires(updated);
+      setSelectedId(item.id);
+      alert('Questionário salvo com sucesso!');
+    } catch (error) {
+      console.error('Erro ao salvar questionário:', error);
+      alert('Erro ao salvar questionário. Tente novamente.');
+    }
   }
 
-  function deleteQuestionnaire(id: string) {
+  async function deleteQuestionnaire(id: string) {
     if (!window.confirm('Tem certeza que deseja deletar este questionário?')) return;
-    const updated = questionnaires.filter(q => q.id !== id);
-    setQuestionnaires(updated);
-    try { localStorage.setItem('sr_questionarios', JSON.stringify(updated)); } catch(e){}
-    if (selectedId === id) {
-      setSelectedId(null);
-      setIsResponding(false);
+    
+    try {
+      await questionariosAPI.delete(parseInt(id));
+      const updated = questionnaires.filter(q => q.id !== id);
+      setQuestionnaires(updated);
+      if (selectedId === id) {
+        setSelectedId(null);
+        setIsResponding(false);
+      }
+      alert('Questionário excluído com sucesso!');
+    } catch (error) {
+      console.error('Erro ao excluir questionário:', error);
+      alert('Erro ao excluir questionário. Tente novamente.');
     }
   }
 
@@ -756,26 +884,107 @@ function Responder({ questions, onSubmit, currentUser, isManager, onViewResults 
   );
 }
 
-function Results({ questions, responses, currentUser }: { questions: Question[]; responses: any[]; currentUser?: { name: string; role: string } | null }){
+function Results({ questions, responses, currentUser }: { questions: Question[]; responses: any[]; currentUser?: { id?: string; name: string; role: string } | null }){
   const [selectedResponse, setSelectedResponse] = useState<any | null>(null);
   const [selectedQuestionnaire, setSelectedQuestionnaire] = useState<Questionnaire | null>(null);
+  const [questionnaires, setQuestionnaires] = useState<Questionnaire[]>([]);
+  const [localResponses, setLocalResponses] = useState<any[]>(responses);
   
-  // Load all questionnaires to show their titles
-  const loadQuestionnaires = (): Questionnaire[] => {
-    try {
-      const raw = localStorage.getItem('sr_questionarios');
-      const parsed = raw ? JSON.parse(raw) : [];
-      if (Array.isArray(parsed)) return parsed;
-    } catch (e) { /* ignore */ }
-    return [];
-  };
+  // Update localResponses when responses prop changes
+  React.useEffect(() => {
+    if (responses && responses.length > 0) {
+      console.log('📥 [Results] Atualizando localResponses com prop responses:', responses);
+      setLocalResponses(responses);
+    }
+  }, [responses]);
+  
+  // Load all questionnaires from API
+  React.useEffect(() => {
+    async function loadQuestionnaires() {
+      try {
+        const apiQuestionnaires = await questionariosAPI.getAll();
+        const converted = apiQuestionnaires.map((q: Questionario) => ({
+          id: q.id?.toString() || String(Date.now()),
+          title: q.titulo,
+          coverImage: q.coverImage,
+          questions: q.perguntas.map(p => ({
+            id: p.id || String(Date.now()),
+            text: p.conteudo,
+            type: (p.perguntaTipo === 'TEXT' ? 'text' : p.perguntaTipo === 'SATISFACTION' ? 'satisfaction' : 'mcq') as 'text' | 'mcq' | 'satisfaction',
+            options: p.options ? JSON.parse(p.options) : undefined,
+            required: p.required || false
+          }))
+        }));
+        setQuestionnaires(converted);
+      } catch (error) {
+        console.error('Erro ao carregar questionários da API:', error);
+        // Fallback to localStorage
+        try {
+          const raw = localStorage.getItem('sr_questionarios');
+          const parsed = raw ? JSON.parse(raw) : [];
+          if (Array.isArray(parsed)) setQuestionnaires(parsed);
+        } catch (e) {}
+      }
+    }
+    loadQuestionnaires();
+  }, []);
+  
+  // Load responses from API when component mounts
+  React.useEffect(() => {
+    async function loadResponses() {
+      try {
+        console.log('🔄 [Results] Carregando respostas da API ao montar componente...');
+        const respData = await respostasAPI.getAll();
+        console.log('[Results] Respostas da API:', respData);
+        
+        const convertedResponses = respData.map(apiResp => {
+          const answers: Record<string, string> = {};
+          apiResp.respostas.forEach((r: any) => {
+            answers[r.perguntaId.toString()] = r.resposta;
+          });
+          
+          // Convert numeric userId back to usr_XXX format
+          const userIdStr = `usr_${String(apiResp.userId).padStart(3, '0')}`;
+          
+          return {
+            id: apiResp.id?.toString() || String(Date.now()),
+            questionnaireId: apiResp.questionarioId.toString(),
+            answers: answers,
+            userId: userIdStr,
+            userName: userIdStr,
+            timestamp: apiResp.timestamp || new Date().toISOString()
+          };
+        });
+        
+        console.log('[Results] Respostas convertidas:', convertedResponses);
+        setLocalResponses(convertedResponses);
+      } catch (error) {
+        console.error('[Results] Erro ao carregar respostas:', error);
+        setLocalResponses(responses);
+      }
+    }
+    loadResponses();
+  }, []);
 
-  const questionnaires = loadQuestionnaires();
-
+  console.log('=== RESULTS COMPONENT ===');
+  console.log('Current User:', currentUser);
+  console.log('Todas as respostas (localResponses):', localResponses);
+  console.log('Número total de respostas:', localResponses.length);
+  
   // Filter responses by current user (only for clients viewing their own responses)
   const userResponses = currentUser && currentUser.role === 'cliente' 
-    ? responses.filter(r => r.userId === currentUser.name)
-    : responses;
+    ? localResponses.filter(r => {
+        const responseUserId = String(r.userId);
+        const currentUserId = String(currentUser.id);
+        console.log('Comparando userId:', responseUserId, 'com currentUser.id:', currentUserId);
+        console.log('São iguais?', responseUserId === currentUserId);
+        return responseUserId === currentUserId;
+      })
+    : localResponses;
+  
+  console.log('Total de respostas:', localResponses.length);
+  console.log('Respostas filtradas para usuário:', userResponses.length);
+  console.log('Respostas filtradas:', userResponses);
 
   // Group responses by questionnaire
   const responsesByQuestionnaire: Record<string, any[]> = {};

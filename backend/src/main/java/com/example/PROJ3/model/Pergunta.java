@@ -19,6 +19,11 @@ public class Pergunta {
     private String conteudo;
     @Enumerated(EnumType.STRING)
     private PerguntaTipo perguntaTipo;
+    
+    @Column(length = 1000)
+    private String options; // JSON string array for MCQ options
+    
+    private boolean required = false;
 
     public Pergunta(String conteudo, PerguntaTipo perguntaTipo) {
         this.conteudo = conteudo;
