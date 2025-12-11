@@ -370,8 +370,8 @@ const css = `
 /* Help bubble */
 .help-bubble {
   position: fixed;
-  right: -80px;
-  bottom: 20px;
+  right: -120px;
+  bottom: 0;
   z-index: 10;
   display: flex;
   flex-direction: column;
@@ -382,13 +382,14 @@ const css = `
 
 .help-speech-bubble {
   background: white;
-  padding: 20px 24px;
-  border-radius: 16px;
+  padding: 16px 20px;
+  border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
   position: relative;
-  margin-bottom: -10px;
-  margin-right: 100px;
+  margin-bottom: 10px;
+  margin-right: 150px;
   z-index: 2;
+  max-width: 240px;
 }
 
 [data-theme="dark"] .help-speech-bubble {
@@ -399,12 +400,12 @@ const css = `
 .help-speech-bubble:after {
   content: '';
   position: absolute;
-  bottom: -15px;
-  left: 80px;
+  bottom: -10px;
+  right: 60px;
   width: 0;
   height: 0;
   border-style: solid;
-  border-width: 15px 0 0 15px;
+  border-width: 10px 10px 0 0;
   border-color: white transparent transparent transparent;
 }
 
@@ -446,8 +447,8 @@ const css = `
 }
 
 .help-illustration {
-  width: 280px;
-  height: 280px;
+  width: 350px;
+  height: 400px;
   flex-shrink: 0;
   position: relative;
   z-index: 1;

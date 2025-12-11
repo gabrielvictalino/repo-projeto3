@@ -23,19 +23,25 @@ export default function Logon({ onLogin }: { onLogin: (user: User) => void }) {
 
   async function submit() {
     setError(null);
-    if (!name.trim()) { setError('Informe o nome de usuário'); return; }
+    if (!name.trim()) { setError('Informe o e-mail ou CPF'); return; }
     if (!password) { setError('Informe a senha'); return; }
     
     try {
       // Try API login first
       const apiUser = await usuariosAPI.login(name.trim(), password);
       // Convert API user to frontend User type
+      const userId = `usr_${String(apiUser.id).padStart(3, '0')}`;
       const user: User = {
-        id: apiUser.id?.toString() || '',
+        id: userId,
         name: apiUser.nome,
         email: apiUser.email,
-        role: apiUser.tipo === 'MANAGER' ? 'manager' : 'cliente'
+        role: apiUser.tipo === 'MANAGER' ? 'manager' : 'cliente',
+        cpf: apiUser.cpf,
+        sobrenome: apiUser.sobrenome,
+        genero: apiUser.genero,
+        escolaridade: apiUser.escolaridade
       };
+      console.log('✅ Login via API bem-sucedido:', user);
       onLogin(user);
       setName(''); 
       setPassword('');
@@ -44,9 +50,10 @@ export default function Logon({ onLogin }: { onLogin: (user: User) => void }) {
       // Fallback to local validation
       const validUser = validateCredentials(name.trim(), password);
       if (!validUser) {
-        setError('Credenciais inválidas. Verifique nome e senha.');
+        setError('Credenciais inválidas. Verifique e-mail/CPF e senha.');
         return;
       }
+      console.log('✅ Login local bem-sucedido:', validUser);
       onLogin(validUser);
       setName(''); 
       setPassword('');
@@ -87,8 +94,8 @@ export default function Logon({ onLogin }: { onLogin: (user: User) => void }) {
           <form onSubmit={(e) => { e.preventDefault(); submit(); }}>
             <h2>Login</h2>
             <div className="field">
-              <label>CPF</label>
-              <input value={name} onChange={e => setName(e.target.value)} placeholder="Seu nome" />
+              <label>E-mail ou CPF</label>
+              <input value={name} onChange={e => setName(e.target.value)} placeholder="seu.email@exemplo.com" />
             </div>
             <div className="field">
               <label>Senha</label>
@@ -123,13 +130,12 @@ export default function Logon({ onLogin }: { onLogin: (user: User) => void }) {
 
             <div className="register-section">
               <p>Ainda não tem uma conta Sebrae?</p>
-              <a href="#" className="btn-register">Cadastre-se</a>
+              <a href="/cadastro" className="btn-register">Cadastre-se</a>
             </div>
 
             <div style={{ fontSize: 11, color: '#6b7280', marginTop: 16, lineHeight: 1.5, textAlign: 'center' }}>
-              <span style={{display: 'inline-flex', alignItems: 'center', gap: 6}}><LightBulbIcon size={16} /> <strong>Credenciais de teste:</strong></span><br/>
-              Manager: <code>admin/admin123</code> ou <code>manager/manager123</code><br/>
-              Cliente: <code>cliente1/cliente123</code> ou <code>joao/joao123</code>
+              <span style={{display: 'inline-flex', alignItems: 'center', gap: 6}}><LightBulbIcon size={16} /> <strong>Nota:</strong></span><br/>
+              Para criar conta de Manager, é necessário o token: <code>hjk</code>
             </div>
           </div>
       </div>

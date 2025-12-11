@@ -31,13 +31,38 @@ interface PerfilProps {
 export default function Perfil({ user, onLogout }: PerfilProps) {
   const navigate = useNavigate();
   
+  // Mapear valores do backend para o formato do perfil
+  const mapGender = (genero?: string): string => {
+    if (!genero) return '';
+    const mapping: Record<string, string> = {
+      'MASCULINO': 'masculino',
+      'FEMININO': 'feminino',
+      'OUTRO': 'outro',
+      'PREFIRO_NAO_DIZER': 'prefiro-nao-dizer'
+    };
+    return mapping[genero] || genero.toLowerCase();
+  };
+
+  const mapEducation = (escolaridade?: string): string => {
+    if (!escolaridade) return '';
+    const mapping: Record<string, string> = {
+      'FUNDAMENTAL': 'fundamental',
+      'MEDIO': 'medio',
+      'SUPERIOR': 'superior',
+      'POS_GRAD': 'pos',
+      'MESTRADO': 'mestrado',
+      'DOUTORADO': 'doutorado'
+    };
+    return mapping[escolaridade] || escolaridade.toLowerCase();
+  };
+  
   const [profile, setProfile] = useState<UserProfile>({
-    cpf: '',
+    cpf: user?.cpf || '',
     birthDate: '',
-    firstName: '',
-    lastName: '',
-    gender: '',
-    education: '',
+    firstName: user?.name || '',
+    lastName: user?.sobrenome || '',
+    gender: mapGender(user?.genero),
+    education: mapEducation(user?.escolaridade),
     cep: '',
     address: '',
     city: '',

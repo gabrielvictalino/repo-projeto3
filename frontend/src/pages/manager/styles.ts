@@ -220,11 +220,135 @@ const css = `
   border-bottom: 2px solid var(--sr-border);
 }
 
+.section-header.centered {
+  justify-content: center;
+}
+
 .section-header h3 {
   margin: 0;
   font-size: 24px;
   color: var(--sr-text);
   font-weight: 600;
+}
+
+/* Welcome Content */
+.welcome-content {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.welcome-card {
+  background: var(--sr-bg);
+  padding: 24px;
+  border-radius: 8px;
+  border: 1px solid var(--sr-border);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  text-align: center;
+}
+
+.welcome-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0, 75, 141, 0.12);
+}
+
+.welcome-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.welcome-card h4 {
+  margin: 0 0 12px 0;
+  font-size: 18px;
+  color: var(--sr-text);
+  font-weight: 600;
+}
+
+.welcome-card p {
+  margin: 0;
+  font-size: 14px;
+  color: var(--sr-text-secondary);
+  line-height: 1.6;
+}
+
+.sebrae-info {
+  background: linear-gradient(135deg, var(--sr-blue), var(--sr-teal));
+  padding: 32px;
+  border-radius: 8px;
+  text-align: center;
+  color: white;
+}
+
+.sebrae-info p {
+  color: rgba(255, 255, 255, 0.95);
+}
+
+/* Instructions Section */
+.instructions-section {
+  margin-top: 32px;
+  padding: 24px;
+  background: var(--sr-bg);
+  border-radius: 8px;
+  border: 1px solid var(--sr-border);
+}
+
+.instructions-section h4 {
+  margin: 0 0 24px 0;
+  font-size: 20px;
+  color: var(--sr-text);
+  font-weight: 600;
+  text-align: center;
+}
+
+.instructions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.instruction-step {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  padding: 16px;
+  background: var(--sr-surface);
+  border-radius: 8px;
+  border: 1px solid var(--sr-border);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.instruction-step:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 75, 141, 0.1);
+}
+
+.step-number {
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, var(--sr-blue), var(--sr-teal));
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.step-content h5 {
+  margin: 0 0 8px 0;
+  font-size: 16px;
+  color: var(--sr-text);
+  font-weight: 600;
+}
+
+.step-content p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--sr-text-secondary);
+  line-height: 1.5;
 }
 
 .btn-add {

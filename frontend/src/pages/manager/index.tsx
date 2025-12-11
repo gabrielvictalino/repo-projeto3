@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import type { User } from '../../types/user';
 import injectManagerStyles from './styles';
-import { UserIcon, ManagerIcon, TrashIcon, ChartIcon } from '../../components/Icons';
+import { UserIcon, ManagerIcon, TrashIcon, ChartIcon, HomeIcon, PlusIcon, DocumentIcon, UsersIcon, BellIcon } from '../../components/Icons';
+import { usuariosAPI } from '../../services/api';
 
 injectManagerStyles();
 
@@ -28,9 +29,29 @@ export default function ManagerPanel() {
     }
   });
 
+  const [dbUsers, setDbUsers] = useState<any[]>([]);
+  const [totalUsers, setTotalUsers] = useState(0);
+  const [totalManagers, setTotalManagers] = useState(0);
+  const [totalClientes, setTotalClientes] = useState(0);
   const [showAddUser, setShowAddUser] = useState(false);
   const [newUser, setNewUser] = useState({ name: '', email: '', role: 'cliente' as 'manager' | 'cliente' });
   const [currentQuoteIndex, setCurrentQuoteIndex] = useState(0);
+
+  // Carregar usuários do banco de dados
+  useEffect(() => {
+    async function loadUsersFromDB() {
+      try {
+        const usuarios = await usuariosAPI.findAll();
+        setDbUsers(usuarios);
+        setTotalUsers(usuarios.length);
+        setTotalManagers(usuarios.filter(u => u.tipo === 'MANAGER').length);
+        setTotalClientes(usuarios.filter(u => u.tipo === 'CLIENTE').length);
+      } catch (error) {
+        console.error('Erro ao carregar usuários do banco:', error);
+      }
+    }
+    loadUsersFromDB();
+  }, []);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -116,119 +137,97 @@ export default function ManagerPanel() {
 
       <div className="manager-sections">
         <section className="manager-section">
-          <div className="section-header">
-            <h3>👥 Usuários Cadastrados</h3>
-            <button className="btn-add" onClick={() => setShowAddUser(!showAddUser)}>
-              {showAddUser ? '✕ Cancelar' : '+ Novo Usuário'}
-            </button>
+          <div className="section-header centered">
+            <h3>📊 Bem-vindo ao Painel SEBRAE</h3>
           </div>
 
-          {showAddUser && (
-            <div className="add-user-form">
-              <div className="form-row">
-                <div className="field">
-                  <label>Nome*</label>
-                  <input 
-                    value={newUser.name} 
-                    onChange={e => setNewUser(prev => ({ ...prev, name: e.target.value }))}
-                    placeholder="Nome do usuário"
-                  />
+          <div className="welcome-content">
+            <div className="welcome-card">
+              <PlusIcon size={48} />
+              <h4>Criar Questionários</h4>
+              <p>Crie novos questionários personalizados com perguntas de múltipla escolha, escalas e textos.</p>
+            </div>
+
+            <div className="welcome-card">
+              <ChartIcon size={48} />
+              <h4>Ver Resultados</h4>
+              <p>Analise respostas, visualize gráficos e exporte relatórios detalhados.</p>
+            </div>
+
+            <div className="welcome-card">
+              <UsersIcon size={48} />
+              <h4>Gerenciar Respondentes</h4>
+              <p>Veja quem respondeu, acompanhe o progresso e envie lembretes.</p>
+            </div>
+
+            <div className="welcome-card">
+              <DocumentIcon size={48} />
+              <h4>Feedbacks Recebidos</h4>
+              <p>Leia feedbacks dos usuários e responda dúvidas ou comentários.</p>
+            </div>
+          </div>
+
+          <div className="instructions-section">
+            <h4>📋 Como Usar a Plataforma</h4>
+            <div className="instructions-grid">
+              <div className="instruction-step">
+                <div className="step-number">1</div>
+                <div className="step-content">
+                  <h5>Criar Questionário</h5>
+                  <p>Clique em "Criar" no menu e adicione suas perguntas usando os tipos disponíveis.</p>
                 </div>
-                <div className="field">
-                  <label>E-mail</label>
-                  <input 
-                    type="email"
-                    value={newUser.email} 
-                    onChange={e => setNewUser(prev => ({ ...prev, email: e.target.value }))}
-                    placeholder="email@exemplo.com"
-                  />
+              </div>
+              <div className="instruction-step">
+                <div className="step-number">2</div>
+                <div className="step-content">
+                  <h5>Compartilhar</h5>
+                  <p>Envie o link do questionário para seus clientes ou disponibilize na aba "Questionários".</p>
                 </div>
-                <div className="field">
-                  <label>Tipo</label>
-                  <select 
-                    value={newUser.role} 
-                    onChange={e => setNewUser(prev => ({ ...prev, role: e.target.value as any }))}
-                  >
-                    <option value="cliente">Cliente</option>
-                    <option value="manager">Manager</option>
-                  </select>
+              </div>
+              <div className="instruction-step">
+                <div className="step-number">3</div>
+                <div className="step-content">
+                  <h5>Acompanhar Respostas</h5>
+                  <p>Acesse "Respondentes" para ver quem já respondeu e "Resultados" para análises.</p>
                 </div>
-                <button className="btn-save" onClick={addUser}>Adicionar</button>
+              </div>
+              <div className="instruction-step">
+                <div className="step-number">4</div>
+                <div className="step-content">
+                  <h5>Receber Feedback</h5>
+                  <p>Veja os feedbacks deixados pelos usuários na aba "Feedbacks" e responda quando necessário.</p>
+                </div>
               </div>
             </div>
-          )}
+          </div>
 
-          <div className="users-table">
-            {users.length === 0 ? (
-              <div className="empty-state">Nenhum usuário cadastrado ainda.</div>
-            ) : (
-              <table>
-                <thead>
-                  <tr>
-                    <th>Nome</th>
-                    <th>E-mail</th>
-                    <th>Tipo</th>
-                    <th>Cadastro</th>
-                    <th>Ações</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {users.map(user => (
-                    <tr key={user.id}>
-                      <td className="user-name">{user.name}</td>
-                      <td className="user-email">{user.email || '—'}</td>
-                      <td>
-                        <span className={`role-badge ${user.role}`}>
-                          <span style={{display: 'flex', alignItems: 'center', gap: 6}}>
-                            {user.role === 'manager' ? <><ManagerIcon size={14} /> Manager</> : <><UserIcon size={14} /> Cliente</>}
-                          </span>
-                        </span>
-                      </td>
-                      <td className="user-date">
-                        {user.createdAt ? new Date(user.createdAt).toLocaleDateString('pt-BR') : '—'}
-                      </td>
-                      <td className="user-actions">
-                        <button 
-                          className="btn-toggle" 
-                          onClick={() => toggleRole(user.id)}
-                          title="Alternar tipo de usuário"
-                        >
-                          🔄
-                        </button>
-                        <button 
-                          className="btn-delete" 
-                          onClick={() => deleteUser(user.id)}
-                          title="Remover usuário"
-                        >
-                          <TrashIcon size={14} />
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
+          <div className="sebrae-info">
+            <img src="/assets/sebrae-logo.gif" alt="SEBRAE" style={{ height: '60px', marginBottom: '16px' }} />
+            <p style={{ fontSize: '14px', color: '#6b7280', lineHeight: '1.6', maxWidth: '600px', margin: '0 auto' }}>
+              O SEBRAE apoia o empreendedorismo brasileiro oferecendo ferramentas e soluções que impulsionam 
+              pequenas e médias empresas. Utilize esta plataforma para fortalecer a conexão com seus clientes.
+            </p>
           </div>
         </section>
 
         <section className="manager-section">
           <div className="section-header">
-            <h3 style={{display: 'flex', alignItems: 'center', gap: 8}}><ChartIcon size={20} /> Estatísticas</h3>
+            <h3 style={{display: 'flex', alignItems: 'center', gap: 8}}><ChartIcon size={20} /> Estatísticas de Usuários</h3>
           </div>
           <div className="stats-grid">
             <div className="stat-card">
               <div className="stat-icon">👥</div>
-              <div className="stat-value">{users.length}</div>
+              <div className="stat-value">{totalUsers}</div>
               <div className="stat-label">Total de Usuários</div>
             </div>
             <div className="stat-card">
               <div className="stat-icon">👔</div>
-              <div className="stat-value">{users.filter(u => u.role === 'manager').length}</div>
+              <div className="stat-value">{totalManagers}</div>
               <div className="stat-label">Managers</div>
             </div>
             <div className="stat-card">
               <div className="stat-icon"><UserIcon size={24} /></div>
-              <div className="stat-value">{users.filter(u => u.role === 'cliente').length}</div>
+              <div className="stat-value">{totalClientes}</div>
               <div className="stat-label">Clientes</div>
             </div>
           </div>

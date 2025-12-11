@@ -8,6 +8,10 @@ export interface User {
   token?: string;
   createdAt?: string;
   avatarUrl?: string;
+  cpf?: string;
+  sobrenome?: string;
+  genero?: string;
+  escolaridade?: string;
 }
 
 export interface UserContextType {

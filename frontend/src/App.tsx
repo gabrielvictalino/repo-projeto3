@@ -4,6 +4,7 @@ import './App.css';
 import QuestionarioPage from './pages/questionario/index';
 import type { View } from './pages/questionario/index';
 import Logon from './pages/login/index';
+import Cadastro from './pages/cadastro/index';
 import HomePage from './pages/home/index';
 import ManagerPanel from './pages/manager/index';
 import Perfil from './pages/perfil';
@@ -243,6 +244,7 @@ function App() {
         <main className="sr-main" style={{ flex: 1 }}>
           <Routes>
             <Route path="/login" element={<AnimatedRoute><Logon onLogin={(u) => { setUser(u); try{ localStorage.setItem('sr_user', JSON.stringify(u)); }catch(e){} navigate(u.role === 'manager' ? '/gerenciar' : '/home'); }} /></AnimatedRoute>} />
+            <Route path="/cadastro" element={<AnimatedRoute><Cadastro /></AnimatedRoute>} />
             
             {/* Shared routes for authenticated users */}
             {user && <Route path="/perfil" element={<AnimatedRoute><Perfil user={user} onLogout={handleLogout} /></AnimatedRoute>} />}

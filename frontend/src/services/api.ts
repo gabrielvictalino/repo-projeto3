@@ -82,28 +82,15 @@ export interface Usuario {
   id?: number;
   cpf?: string;
   nome: string;
-  sobrenome?: string;
+  sobrenome: string;
   email: string;
   senha?: string;
-  tipo: 'CLIENTE' | 'MANAGER';
-  genero?: string;
-  escolaridade?: string;
+  tipo: 'MANAGER' | 'CLIENTE';
+  genero?: 'MASCULINO' | 'FEMININO' | 'OUTRO' | 'PREFIRO_NAO_DIZER';
+  escolaridade?: 'FUNDAMENTAL' | 'MEDIO' | 'SUPERIOR' | 'POS_GRAD' | 'MESTRADO' | 'DOUTORADO';
 }
 
 export const usuariosAPI = {
-  getAll: async (): Promise<Usuario[]> => {
-    const response = await fetch(`${API_BASE_URL}/usuarios/find/all`);
-    if (response.status === 204) return [];
-    if (!response.ok) throw new Error('Erro ao buscar usuários');
-    return response.json();
-  },
-
-  getById: async (id: number): Promise<Usuario> => {
-    const response = await fetch(`${API_BASE_URL}/usuarios/find/${id}`);
-    if (!response.ok) throw new Error('Usuário não encontrado');
-    return response.json();
-  },
-
   create: async (usuario: Usuario): Promise<Usuario> => {
     const response = await fetch(`${API_BASE_URL}/usuarios/create`, {
       method: 'POST',
@@ -111,6 +98,29 @@ export const usuariosAPI = {
       body: JSON.stringify(usuario),
     });
     if (!response.ok) throw new Error('Erro ao criar usuário');
+    return response.json();
+  },
+
+  login: async (email: string, senha: string): Promise<Usuario> => {
+    const response = await fetch(`${API_BASE_URL}/usuarios/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, senha }),
+    });
+    if (!response.ok) throw new Error('Credenciais inválidas');
+    return response.json();
+  },
+
+  findAll: async (): Promise<Usuario[]> => {
+    const response = await fetch(`${API_BASE_URL}/usuarios/find/all`);
+    if (response.status === 204) return [];
+    if (!response.ok) throw new Error('Erro ao buscar usuários');
+    return response.json();
+  },
+
+  findById: async (id: number): Promise<Usuario> => {
+    const response = await fetch(`${API_BASE_URL}/usuarios/find/${id}`);
+    if (!response.ok) throw new Error('Usuário não encontrado');
     return response.json();
   },
 
@@ -128,17 +138,7 @@ export const usuariosAPI = {
     const response = await fetch(`${API_BASE_URL}/usuarios/delete/${id}`, {
       method: 'DELETE',
     });
-    if (!response.ok) throw new Error('Erro ao deletar usuário');
-  },
-
-  login: async (email: string, senha: string): Promise<Usuario> => {
-    const response = await fetch(`${API_BASE_URL}/usuarios/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, senha }),
-    });
-    if (!response.ok) throw new Error('Credenciais inválidas');
-    return response.json();
+    if (!response.ok) throw new Error('Erro ao excluir usuário');
   },
 };
 
